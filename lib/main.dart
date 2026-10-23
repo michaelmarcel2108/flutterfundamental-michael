@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DashboardPage(),
+      home: Tahap1Page(),
     );
   }
 
@@ -329,3 +329,179 @@ class CourseItemWidget extends StatelessWidget {
     );
   }
 }
+
+/// Halaman demonstrasi praktikum Tahap 1:
+/// Mengamati Masalah Layout yang Tidak Responsif dan Perbaikannya.
+class Tahap1Page extends StatefulWidget {
+  const Tahap1Page({super.key});
+
+  @override
+  State<Tahap1Page> createState() => _Tahap1PageState();
+}
+
+class _Tahap1PageState extends State<Tahap1Page> {
+  bool isResponsive = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tahap 1: Pengamatan Layout'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Identitas Mahasiswa
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.person, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Nama: $studentName\nNIM: $studentId',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Tombol Switch Mode untuk Uji Coba
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isResponsive ? 'Mode: RESPONTIF' : 'Mode: HARD-CODED',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isResponsive ? Colors.green : Colors.red,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      isResponsive = !isResponsive;
+                    });
+                  },
+                  icon: Icon(isResponsive ? Icons.replay : Icons.check_circle),
+                  label: Text(
+                    isResponsive ? 'Uji Hard-coded (500)' : 'Uji Responsif',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isResponsive ? Colors.orange : Colors.green,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 30),
+
+            // 1. KONDISI HARD-CODED (width: 500)
+            if (!isResponsive) ...[
+              const Text(
+                '1. Container dengan width: 500 (Hard-coded di dalam Row):',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Perhatikan strip kuning-hitam di kanan (overflow) pada mode portrait HP:',
+                style: TextStyle(color: Colors.red, fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Container(
+                    width: 500,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade200,
+                      border: Border.all(color: Colors.amber.shade800, width: 2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '$studentId - $studentName',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ]
+            // 2. KONDISI RESPONSIF (Expanded / double.infinity)
+            else ...[
+              const Text(
+                '2. Container Responsif (Menggunakan Expanded di dalam Row):',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Ukuran menyesuaikan 100% lebar layar secara fleksibel tanpa overflow:',
+                style: TextStyle(color: Colors.green, fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade200,
+                        border: Border.all(color: Colors.green.shade800, width: 2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '$studentId - $studentName',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                '3. Atau Menggunakan width: double.infinity:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade100,
+                  border: Border.all(color: Colors.blue.shade600, width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$studentId - $studentName',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
