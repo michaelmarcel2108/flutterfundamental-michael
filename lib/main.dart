@@ -8,12 +8,22 @@ const String studentId = '2455011003';
 final List<Map<String, dynamic>> topics = [
   {'title': 'Git & GitHub', 'subtitle': 'Version control', 'done': true},
   {'title': 'Dart Fundamentals', 'subtitle': 'Language basics', 'done': true},
-  {'title': 'Flutter UI Fundamentals', 'subtitle': 'Widgets & layout', 'done': false},
-  {'title': '$studentId - $studentName', 'subtitle': 'Pemilik aplikasi', 'done': false},
+  {
+    'title': 'Flutter UI Fundamentals',
+    'subtitle': 'Widgets & layout',
+    'done': false,
+  },
+  {
+    'title': '$studentId - $studentName',
+    'subtitle': 'Pemilik aplikasi',
+    'done': false,
+  },
 ];
 
 Future<Map<String, dynamic>> loadStudentData() async {
-  final jsonString = await rootBundle.loadString('assets/data/student_data.json');
+  final jsonString = await rootBundle.loadString(
+    'assets/data/student_data.json',
+  );
   return jsonDecode(jsonString) as Map<String, dynamic>;
 }
 
@@ -28,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap1Page(),
+      home: Tahap2Page(),
     );
   }
 
@@ -41,7 +51,13 @@ class MyApp extends StatelessWidget {
             children: [
               Icon(icon),
               const SizedBox(height: 6),
-              Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
               Text(label),
             ],
           ),
@@ -138,7 +154,9 @@ class _DashboardPageState extends State<DashboardPage> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              return Center(child: Text('Gagal memuat data: ${snapshot.error}'));
+              return Center(
+                child: Text('Gagal memuat data: ${snapshot.error}'),
+              );
             }
 
             final data = snapshot.data!;
@@ -152,7 +170,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 ProfileHeader(student: student),
                 SummaryRow(courses: courses),
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
                   child: Text(
                     'Daftar Materi',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -202,7 +223,10 @@ class ProfileHeader extends StatelessWidget {
               children: [
                 Text(
                   student['name'] ?? '',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text('NIM: ${student['nim']}'),
@@ -213,7 +237,7 @@ class ProfileHeader extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -227,15 +251,30 @@ class SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final totalCourses = courses.length;
-    final totalCredits = courses.fold<int>(0, (sum, course) => sum + ((course['credits'] as int?) ?? 0));
+    final totalCredits = courses.fold<int>(
+      0,
+      (sum, course) => sum + ((course['credits'] as int?) ?? 0),
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         children: [
-          Expanded(child: _buildSummaryCard('Total Topik', totalCourses.toString(), Icons.menu_book)),
+          Expanded(
+            child: _buildSummaryCard(
+              'Total Topik',
+              totalCourses.toString(),
+              Icons.menu_book,
+            ),
+          ),
           const SizedBox(width: 16),
-          Expanded(child: _buildSummaryCard('Total SKS', totalCredits.toString(), Icons.star)),
+          Expanded(
+            child: _buildSummaryCard(
+              'Total SKS',
+              totalCredits.toString(),
+              Icons.star,
+            ),
+          ),
         ],
       ),
     );
@@ -253,7 +292,7 @@ class SummaryRow extends StatelessWidget {
             color: Colors.grey.shade200,
             blurRadius: 4,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -401,7 +440,9 @@ class _Tahap1PageState extends State<Tahap1Page> {
                     isResponsive ? 'Uji Hard-coded (500)' : 'Uji Responsif',
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isResponsive ? Colors.orange : Colors.green,
+                    backgroundColor: isResponsive
+                        ? Colors.orange
+                        : Colors.green,
                     foregroundColor: Colors.white,
                   ),
                 ),
@@ -428,7 +469,10 @@ class _Tahap1PageState extends State<Tahap1Page> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.amber.shade200,
-                      border: Border.all(color: Colors.amber.shade800, width: 2),
+                      border: Border.all(
+                        color: Colors.amber.shade800,
+                        width: 2,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -461,7 +505,10 @@ class _Tahap1PageState extends State<Tahap1Page> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.green.shade200,
-                        border: Border.all(color: Colors.green.shade800, width: 2),
+                        border: Border.all(
+                          color: Colors.green.shade800,
+                          width: 2,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -505,3 +552,134 @@ class _Tahap1PageState extends State<Tahap1Page> {
   }
 }
 
+/// Halaman demonstrasi praktikum Tahap 2:
+/// MediaQuery: Membaca Karakteristik Layar
+class Tahap2Page extends StatelessWidget {
+  const Tahap2Page({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // 6. Membaca ukuran layar dan orientasi menggunakan MediaQuery
+    final size = MediaQuery.of(context).size;
+    final orientation = MediaQuery.of(context).orientation;
+
+    // 9. Kondisi: jika width < 600 'Compact', selain itu 'Wide'
+    final isCompact = size.width < 600;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tahap 2: MediaQuery'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Identitas Mahasiswa (Nama & NIM)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.indigo.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.indigo.shade200),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.person, color: Colors.indigo),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Nama: $studentName\nNIM: $studentId',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Card Karakteristik Layar
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Karakteristik Layar (MediaQuery):',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Divider(height: 20),
+                    Text(
+                      'Width: ${size.width.toStringAsFixed(0)}',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Height: ${size.height.toStringAsFixed(0)}',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Orientation: $orientation',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    const Divider(height: 24),
+                    // Kondisi: jika width < 600 tampilkan teks 'Compact', selain itu 'Wide'
+                    Row(
+                      children: [
+                        const Text(
+                          'Tampilan: ',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isCompact
+                                ? Colors.orange.shade100
+                                : Colors.green.shade100,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isCompact ? Colors.orange : Colors.green,
+                            ),
+                          ),
+                          child: Text(
+                            isCompact ? 'Compact' : 'Wide',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isCompact
+                                  ? Colors.orange.shade900
+                                  : Colors.green.shade900,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
