@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap8Page(),
+      home: Tahap9Page(),
     );
   }
 
@@ -1614,6 +1614,25 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const Tahap8Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.keyboard_return_rounded,
+              color: currentTahap == 9 ? Colors.pink : Colors.grey,
+            ),
+            title: const Text('Tahap 9: Returning Data (Pop Result)'),
+            subtitle: const Text('Await Navigator.push & Pop Result true'),
+            selected: currentTahap == 9,
+            selectedTileColor: Colors.pink.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 9) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap9Page()),
                 );
               }
             },
@@ -5773,3 +5792,886 @@ class CourseDetailPage extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// TAHAP 9: RETURNING DATA DARI SCREEN
+// ============================================================================
+
+/// Halaman demonstrasi praktikum Tahap 9:
+/// - 35. Buat tombol 'Pilih/Favorite' pada halaman detail.
+/// - 36. Saat tombol ditekan, kembali ke halaman sebelumnya sambil mengirim nilai true.
+/// - 37. Pada halaman awal, tampilkan SnackBar jika result == true.
+/// - 38. Tulis satu contoh lain penggunaan data hasil dari screen.
+class Tahap9Page extends StatefulWidget {
+  const Tahap9Page({super.key});
+
+  @override
+  State<Tahap9Page> createState() => _Tahap9PageState();
+}
+
+class _Tahap9PageState extends State<Tahap9Page> {
+  // Set untuk mencatat kursus yang telah ditandai sebagai favorit
+  final Set<String> _favoriteCourses = {};
+
+  // Contoh lain (Butir 38): Data hasil dari screen kustom (misal catatan kustom)
+  String? _customFeedback;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 9),
+      appBar: AppBar(
+        title: const Text('Tahap 9: Returning Data'),
+        backgroundColor: Colors.pink.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.pink.shade50.withValues(alpha: 0.3),
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: loadStudentData(),
+          builder: (context, snapshot) {
+            List<dynamic> courses = fallbackCourses;
+            if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data!;
+              if (data['courses'] is List) {
+                courses = data['courses'] as List<dynamic>;
+              }
+            }
+
+            return ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                // ========================================================
+                // HEADER IDENTITAS MAHASISWA
+                // ========================================================
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  color: Colors.pink.shade800,
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 28,
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.favorite, color: Colors.pink, size: 30),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Praktikum Mobile - Tahap 9',
+                                style: TextStyle(
+                                  color: Colors.pinkAccent,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                studentName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.5,
+                                ),
+                              ),
+                              Text(
+                                'NIM: $studentId  •  TRPL Undiksha',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // Kartu Materi Returning Data
+                Card(
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.pink.shade200),
+                  ),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.keyboard_return_rounded,
+                                color: Colors.pink.shade800, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Materi: Returning Data dari Screen',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: Colors.pink.shade900,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Navigator.pop(context, result) dapat mengembalikan nilai ke screen pemanggil. Navigator.push() dapat di-await untuk menerima nilai result tersebut.',
+                          style: TextStyle(fontSize: 12, height: 1.4),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E2E),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'final result = await Navigator.push<bool>(\n'
+                            '  context,\n'
+                            '  MaterialPageRoute(builder: (_) => const DetailPage()),\n'
+                            ');\n'
+                            '// pada detail: Navigator.pop(context, true);',
+                            style: TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 11,
+                              color: Color(0xFF89DDFF),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Header List Materi & Counter Favorit
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.bookmarks_rounded, color: Colors.pink.shade800),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Pilih Kursus untuk Ditandai Favorit:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.pink.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${_favoriteCourses.length} Favorit',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.pink.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // ========================================================
+                // 35, 36, & 37. LISTVIEW DENGAN AWAIT NAVIGATOR.PUSH()
+                // ========================================================
+                ...courses.map((item) {
+                  final Map<String, dynamic> course =
+                      Map<String, dynamic>.from(item as Map);
+                  final String code = course['code']?.toString() ?? 'MOB';
+                  final String title = course['title']?.toString() ?? 'Course';
+                  final int credits = (course['credits'] as num?)?.toInt() ?? 2;
+                  final bool isFavorited = _favoriteCourses.contains(code);
+
+                  return Card(
+                    elevation: 1.5,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: isFavorited
+                            ? Colors.pink.shade300
+                            : Colors.grey.shade200,
+                        width: isFavorited ? 1.5 : 1,
+                      ),
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () async {
+                        // 36. Menunggu nilai kembalian dari CourseFavoriteDetailPage
+                        final result = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CourseFavoriteDetailPage(
+                              course: course,
+                              isAlreadyFavorited: isFavorited,
+                            ),
+                          ),
+                        );
+
+                        // 37. Pada halaman awal, tampilkan SnackBar jika result == true
+                        if (result == true && mounted) {
+                          setState(() {
+                            _favoriteCourses.add(code);
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.favorite,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      'Kursus "$title" berhasil ditambahkan ke Favorit! (result == true)',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12.5,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              backgroundColor: Colors.pink.shade700,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              action: SnackBarAction(
+                                label: 'TUTUP',
+                                textColor: Colors.white,
+                                onPressed: () {},
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: isFavorited
+                                    ? Colors.pink.shade100
+                                    : Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(
+                                isFavorited
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isFavorited
+                                    ? Colors.pink
+                                    : Colors.grey.shade600,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '$code  •  $credits SKS',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isFavorited)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.pink.shade50,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.pink.shade200),
+                                ),
+                                child: Text(
+                                  'Favorit',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.pink.shade800,
+                                  ),
+                                ),
+                              )
+                            else
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 14,
+                                color: Colors.grey.shade400,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
+
+                // ========================================================
+                // 38. CONTOH LAIN PENGGUNAAN DATA HASIL DARI SCREEN
+                // ========================================================
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.purple.shade100,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Icons.extension_rounded,
+                                color: Colors.purple.shade800,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Expanded(
+                              child: Text(
+                                '38. Contoh Lain Penggunaan Data Hasil dari Screen',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 20),
+                        const Text(
+                          'Selain nilai boolean true/false, Navigator.pop(context, result) dapat mengembalikan tipe data apapun (String, int, List, atau Object/Model kustom):',
+                          style: TextStyle(fontSize: 12.5, height: 1.4),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Penjelasan 4 Kasus Nyata
+                        _buildExamplePoint(
+                          number: '1',
+                          title: 'Formulir Edit Data / Profil Mahasiswa',
+                          description:
+                              'Halaman form mengembalikan objek Mahasiswa yang telah diedit: Navigator.pop(context, updatedStudent); sehingga halaman profil langsung terupdate tanpa fetch ulang.',
+                        ),
+                        const SizedBox(height: 8),
+                        _buildExamplePoint(
+                          number: '2',
+                          title: 'Screen Filter & Sorting Katalog',
+                          description:
+                              'Screen filter mengembalikan kriteria pilihan pengguna (rentang harga, kategori, urutan): Navigator.pop(context, filterOptions); untuk memfilter data pada list.',
+                        ),
+                        const SizedBox(height: 8),
+                        _buildExamplePoint(
+                          number: '3',
+                          title: 'Pemilih Item (Location / Contact / Image Picker)',
+                          description:
+                              'Screen pemilih foto atau peta mengembalikan path file gambar (File/String) atau koordinat peta (LatLng) yang dipilih pengguna.',
+                        ),
+                        const SizedBox(height: 8),
+                        _buildExamplePoint(
+                          number: '4',
+                          title: 'Dialog Konfirmasi Hapus Data (Delete Confirmation)',
+                          description:
+                              'Dialog menampilkan "Apakah Anda yakin ingin menghapus data?". Tombol "Hapus" mengirimkan true, sedangkan "Batal" mengirimkan false / null.',
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Demonstrasi Interaktif Contoh Lain (Input Catatan Kustom)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.purple.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.edit_note,
+                                      color: Colors.purple.shade800, size: 18),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Uji Coba: Mengembalikan Teks Catatan (String)',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _customFeedback != null
+                                    ? 'Hasil yang dikembalikan: "$_customFeedback"'
+                                    : 'Belum ada catatan yang dikembalikan.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: _customFeedback != null
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: _customFeedback != null
+                                      ? Colors.purple.shade900
+                                      : Colors.black54,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.purple.shade700,
+                                    foregroundColor: Colors.white,
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                  icon: const Icon(Icons.add_comment, size: 16),
+                                  label: const Text('Buka Dialog Input Catatan'),
+                                  onPressed: () async {
+                                    final textResult =
+                                        await Navigator.push<String>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const CustomFeedbackPage(),
+                                      ),
+                                    );
+                                    if (textResult != null &&
+                                        textResult.isNotEmpty &&
+                                        mounted) {
+                                      setState(() {
+                                        _customFeedback = textResult;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExamplePoint({
+    required String number,
+    required String title,
+    required String description,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CircleAvatar(
+          radius: 10,
+          backgroundColor: Colors.purple.shade700,
+          child: Text(
+            number,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: const TextStyle(fontSize: 11.5, color: Colors.black87),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================================
+// 35 & 36. COURSE FAVORITE DETAIL PAGE
+// - Memiliki tombol 'Pilih/Favorite'
+// - Menutup halaman sambil mengirim Navigator.pop(context, true)
+// ============================================================================
+
+class CourseFavoriteDetailPage extends StatelessWidget {
+  final Map<String, dynamic> course;
+  final bool isAlreadyFavorited;
+
+  const CourseFavoriteDetailPage({
+    super.key,
+    required this.course,
+    this.isAlreadyFavorited = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final String code = course['code']?.toString() ?? 'MOB';
+    final String title = course['title']?.toString() ?? 'Judul Kursus';
+    final int credits = (course['credits'] as num?)?.toInt() ?? 2;
+    final String status = course['status']?.toString() ?? 'planned';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail: $code'),
+        backgroundColor: Colors.pink.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.grey.shade50,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Identitas Mahasiswa di Detail
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                color: Colors.pink.shade800,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 26,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.person, color: Colors.pink, size: 28),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Identitas Mahasiswa',
+                              style: TextStyle(
+                                color: Colors.pinkAccent,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              studentName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              'NIM: $studentId  •  TRPL Undiksha',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Kartu Detail Kursus
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.shade50,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: Colors.pink.shade200),
+                            ),
+                            child: Text(
+                              code,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: Colors.pink.shade800,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '$credits SKS',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Status Mata Kuliah: $status',
+                        style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      ),
+                      const Divider(height: 24),
+
+                      // Penjelasan Aksi Pop Result
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.shade50.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.pink.shade200),
+                        ),
+                        child: const Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.touch_app, size: 18, color: Colors.pink),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Tekan tombol "Pilih/Favorite" di bawah untuk kembali ke halaman awal sambil mengembalikan nilai true (Navigator.pop(context, true)).',
+                                style: TextStyle(fontSize: 12, height: 1.35),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ==========================================================
+              // 35 & 36. TOMBOL 'PILIH/FAVORITE'
+              // Saat tombol ditekan, kembali sambil mengirim nilai true
+              // ==========================================================
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink.shade700,
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: const Icon(Icons.favorite),
+                  label: const Text(
+                    'Pilih/Favorite',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () {
+                    // 36. Kembali ke halaman sebelumnya sambil mengirim nilai true
+                    Navigator.pop(context, true);
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Tombol Batal (mengembalikan nilai false atau null)
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    // Kembali tanpa menandai favorit
+                    Navigator.pop(context, false);
+                  },
+                  child: const Text('Batal / Kembali'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// CONTOH SCREEN PENDUKUNG BUTIR 38 (MENGEMBALIKAN STRING HASIL INPUT)
+// ============================================================================
+
+class CustomFeedbackPage extends StatefulWidget {
+  const CustomFeedbackPage({super.key});
+
+  @override
+  State<CustomFeedbackPage> createState() => _CustomFeedbackPageState();
+}
+
+class _CustomFeedbackPageState extends State<CustomFeedbackPage> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Input Catatan Kustom'),
+        backgroundColor: Colors.purple.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              '38. Contoh Lain Returning Data:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Ketikkan teks catatan di bawah ini. Saat tombol "Kirim Catatan" ditekan, screen ini akan mem-pop dan mengembalikan teks String tersebut ke halaman awal.',
+              style: TextStyle(fontSize: 12.5, color: Colors.black54),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _controller,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Catatan / Review Kursus',
+                border: OutlineInputBorder(),
+                hintText: 'Contoh: Materi Flutter sangat interaktif dan mudah dipahami...',
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple.shade700,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              icon: const Icon(Icons.send),
+              label: const Text('Kirim Catatan (Navigator.pop(context, text))'),
+              onPressed: () {
+                // Mengembalikan teks String ke screen sebelumnya
+                Navigator.pop(context, _controller.text);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
