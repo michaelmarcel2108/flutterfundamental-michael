@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap5Page(),
+      home: Tahap6Page(),
     );
   }
 
@@ -1553,6 +1553,25 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const Tahap5Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.phonelink_setup_rounded,
+              color: currentTahap == 6 ? Colors.purple : Colors.grey,
+            ),
+            title: const Text('Tahap 6: Scrollable & Keyboard'),
+            subtitle: const Text('SingleChildScrollView & Keyboard Handling'),
+            selected: currentTahap == 6,
+            selectedTileColor: Colors.purple.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 6) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap6Page()),
                 );
               }
             },
@@ -3391,6 +3410,867 @@ class CourseCard extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// TAHAP 6: SCROLLABLE CONTENT DAN KEYBOARD
+// ============================================================================
+
+/// Halaman demonstrasi praktikum Tahap 6:
+/// - 22. Buat halaman profil/form sederhana yang lebih tinggi dari layar.
+/// - 23. Uji tanpa SingleChildScrollView lalu tambahkan widget tersebut.
+/// - 24. Buka keyboard dengan TextField dan amati apakah UI masih dapat di-scroll.
+/// - 25. Jelaskan kapan ListView lebih tepat daripada SingleChildScrollView.
+class Tahap6Page extends StatefulWidget {
+  const Tahap6Page({super.key});
+
+  @override
+  State<Tahap6Page> createState() => _Tahap6PageState();
+}
+
+class _Tahap6PageState extends State<Tahap6Page> {
+  // 23. State toggle pengujian dengan atau tanpa SingleChildScrollView
+  bool _useScrollView = true;
+
+  // Form Controllers untuk Butir 22
+  late final TextEditingController _nameController;
+  late final TextEditingController _nimController;
+  late final TextEditingController _prodiController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _addressController;
+  late final TextEditingController _bioController;
+  late final TextEditingController _notesController;
+
+  // 24. FocusNode untuk menguji pembukaan keyboard pada field bawah
+  final FocusNode _notesFocusNode = FocusNode();
+  final FocusNode _bioFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: studentName);
+    _nimController = TextEditingController(text: studentId);
+    _prodiController =
+        TextEditingController(text: 'Teknologi Rekayasa Perangkat Lunak');
+    _emailController =
+        TextEditingController(text: 'michael.marcel@undiksha.ac.id');
+    _phoneController = TextEditingController(text: '081234567890');
+    _addressController =
+        TextEditingController(text: 'Singaraja, Buleleng, Bali');
+    _bioController = TextEditingController(
+      text:
+          'Tertarik pada Mobile Application Development, Flutter UI Engineering, dan Reactive State Management.',
+    );
+    _notesController = TextEditingController(
+      text:
+          'Praktikum Tahap 6: Menguji SingleChildScrollView saat keyboard virtual muncul.',
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _nimController.dispose();
+    _prodiController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _bioController.dispose();
+    _notesController.dispose();
+    _notesFocusNode.dispose();
+    _bioFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final double keyboardHeight = mediaQuery.viewInsets.bottom;
+    final bool isKeyboardOpen = keyboardHeight > 0;
+
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 6),
+      appBar: AppBar(
+        title: const Text('Tahap 6: Scroll & Keyboard'),
+        backgroundColor: Colors.purple.shade800,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            tooltip: isKeyboardOpen ? 'Tutup Keyboard' : 'Fokus Field Bawah',
+            icon: Icon(
+              isKeyboardOpen ? Icons.keyboard_hide : Icons.keyboard,
+            ),
+            onPressed: () {
+              if (isKeyboardOpen) {
+                FocusScope.of(context).unfocus();
+              } else {
+                _notesFocusNode.requestFocus();
+              }
+            },
+          ),
+        ],
+      ),
+      body: Container(
+        color: Colors.grey.shade50,
+        child: Column(
+          children: [
+            // ==========================================================
+            // CONTROL BAR: TOGGLE SCROLLVIEW & STATUS KEYBOARD
+            // ==========================================================
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 23. Header Mode Pengujian Scroll
+                  const Row(
+                    children: [
+                      Icon(Icons.swap_vert, size: 20, color: Colors.purple),
+                      SizedBox(width: 8),
+                      Text(
+                        '23. Mode Pengujian Scroll:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // 23. SegmentedButton Responsive Full-Width
+                  SizedBox(
+                    width: double.infinity,
+                    child: SegmentedButton<bool>(
+                      showSelectedIcon: false,
+                      style: SegmentedButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      segments: const [
+                        ButtonSegment(
+                          value: true,
+                          label: Text(
+                            'Dengan ScrollView',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          icon: Icon(Icons.check_circle, size: 15),
+                        ),
+                        ButtonSegment(
+                          value: false,
+                          label: Text(
+                            'Tanpa Scroll',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          icon: Icon(Icons.warning_amber_rounded, size: 15),
+                        ),
+                      ],
+                      selected: {_useScrollView},
+                      onSelectionChanged: (val) {
+                        setState(() {
+                          _useScrollView = val.first;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // 24. Live Keyboard Status Indicator
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isKeyboardOpen
+                          ? Colors.purple.shade50
+                          : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isKeyboardOpen
+                            ? Colors.purple.shade300
+                            : Colors.grey.shade300,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          isKeyboardOpen
+                              ? Icons.keyboard
+                              : Icons.keyboard_outlined,
+                          size: 16,
+                          color: isKeyboardOpen
+                              ? Colors.purple.shade800
+                              : Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            isKeyboardOpen
+                                ? 'Keyboard Terbuka (${keyboardHeight.toStringAsFixed(0)} dp)'
+                                : 'Keyboard Tertutup (0 dp)',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                              color: isKeyboardOpen
+                                  ? Colors.purple.shade900
+                                  : Colors.grey.shade800,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _useScrollView
+                                ? Colors.green.shade100
+                                : Colors.red.shade100,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            _useScrollView ? 'Bisa Di-scroll' : 'Overflow!',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: _useScrollView
+                                  ? Colors.green.shade800
+                                  : Colors.red.shade800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ==========================================================
+            // KONTEN FORM PROFIL (LEBIH TINGGI DARI LAYAR)
+            // ==========================================================
+            Expanded(
+              child: _useScrollView
+                  ? SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildFormContent(
+                        isScrollEnabled: true,
+                        isKeyboardOpen: isKeyboardOpen,
+                      ),
+                    )
+                  : Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: _buildFormContent(
+                            isScrollEnabled: false,
+                            isKeyboardOpen: isKeyboardOpen,
+                          ),
+                        ),
+                        // Visual Simulasi RenderFlex Overflow Bar khas Flutter di bagian bawah
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            height: 36,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.yellow.shade700,
+                                  Colors.black,
+                                  Colors.yellow.shade700,
+                                  Colors.black,
+                                  Colors.yellow.shade700,
+                                ],
+                                stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                                tileMode: TileMode.repeated,
+                              ),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black38, blurRadius: 4),
+                              ],
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              color: Colors.black87,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 2,
+                              ),
+                              child: const Text(
+                                'A RenderFlex overflowed by 264 pixels on the bottom.',
+                                style: TextStyle(
+                                  color: Colors.yellow,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==========================================================================
+  // WIDGET KONTEN FORMULIR PROFIL (BUTIR 22)
+  // Sesuai kode materi praktikum:
+  // SingleChildScrollView(
+  //   padding: const EdgeInsets.all(16),
+  //   child: Column(
+  //     children: [
+  //       Text('$studentId - $studentName'),
+  //       // form / cards
+  //     ],
+  //   ),
+  // )
+  // ==========================================================================
+  Widget _buildFormContent({
+    required bool isScrollEnabled,
+    required bool isKeyboardOpen,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Identitas Mahasiswa Sesuai Materi
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.purple.shade800, Colors.purple.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              const CircleAvatar(
+                radius: 26,
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, color: Colors.purple, size: 30),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Identitas Pemilik Form',
+                      style: TextStyle(
+                        color: Colors.purpleAccent,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '$studentId - $studentName',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Text(
+                      'Teknologi Rekayasa Perangkat Lunak',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Catatan Observasi Butir 23 & 24
+        Card(
+          elevation: 1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(
+              color: isScrollEnabled ? Colors.green.shade200 : Colors.red.shade200,
+            ),
+          ),
+          color: isScrollEnabled ? Colors.green.shade50 : Colors.red.shade50,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  isScrollEnabled ? Icons.check_circle : Icons.warning_amber_rounded,
+                  color: isScrollEnabled ? Colors.green.shade800 : Colors.red.shade800,
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isScrollEnabled
+                            ? '23. Dengan SingleChildScrollView (Aman)'
+                            : '23. Tanpa SingleChildScrollView (Uji Masalah)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: isScrollEnabled
+                              ? Colors.green.shade900
+                              : Colors.red.shade900,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isScrollEnabled
+                            ? 'Konten formulir yang melebihi tinggi layar dapat digulir dengan lancar. Ketika keyboard terbuka, viewport secara cerdas digulir agar TextField tetap terlihat.'
+                            : 'Column memiliki batas constraint tinggi setinggi layar. Konten yang melebihi tinggi layar memicu RenderFlex Overflow pada sisi bawah, dan keyboard akan menutupi field bawah!',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isScrollEnabled
+                              ? Colors.green.shade900
+                              : Colors.red.shade900,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // ==========================================================
+        // 22. FORMULIR PROFIL MAHASISWA LENGKAP
+        // ==========================================================
+        Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.edit_note_rounded, color: Colors.purple),
+                    SizedBox(width: 8),
+                    Text(
+                      'Formulir Profil Mahasiswa',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(height: 20),
+
+                // Field 1: Nama Lengkap
+                _buildTextField(
+                  label: 'Nama Lengkap Mahasiswa',
+                  controller: _nameController,
+                  icon: Icons.badge,
+                ),
+                const SizedBox(height: 12),
+
+                // Field 2: NIM
+                _buildTextField(
+                  label: 'Nomor Induk Mahasiswa (NIM)',
+                  controller: _nimController,
+                  icon: Icons.numbers,
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 12),
+
+                // Field 3: Program Studi
+                _buildTextField(
+                  label: 'Program Studi',
+                  controller: _prodiController,
+                  icon: Icons.school,
+                ),
+                const SizedBox(height: 12),
+
+                // Field 4: Email Kampus
+                _buildTextField(
+                  label: 'Email Undiksha',
+                  controller: _emailController,
+                  icon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 12),
+
+                // Field 5: Nomor HP / WhatsApp
+                _buildTextField(
+                  label: 'Nomor HP / WhatsApp',
+                  controller: _phoneController,
+                  icon: Icons.phone,
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 12),
+
+                // Field 6: Alamat Domisili (Multiline)
+                _buildTextField(
+                  label: 'Alamat Domisili',
+                  controller: _addressController,
+                  icon: Icons.home,
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+
+                // Field 7: Bio & Minat (Multiline)
+                _buildTextField(
+                  label: 'Bio & Minat Keahlian',
+                  controller: _bioController,
+                  focusNode: _bioFocusNode,
+                  icon: Icons.description,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 12),
+
+                // Field 8: Catatan Praktikum (Field Bawah untuk Butir 24)
+                _buildTextField(
+                  label: 'Catatan Praktikum (Uji Keyboard Butir 24)',
+                  controller: _notesController,
+                  focusNode: _notesFocusNode,
+                  icon: Icons.keyboard_alt_outlined,
+                  maxLines: 3,
+                  helperText:
+                      'Klik field ini untuk membuka keyboard dan mengamati kemampuan scroll!',
+                ),
+                const SizedBox(height: 16),
+
+                // Tombol Aksi Formulir
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple.shade800,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        icon: const Icon(Icons.save),
+                        label: const Text('Simpan Profil'),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Data profil berhasil disimpan!'),
+                              backgroundColor: Colors.purple,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _nameController.text = studentName;
+                          _nimController.text = studentId;
+                        });
+                      },
+                      child: const Text('Reset'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // ==========================================================
+        // 25. PENJELASAN KAPAN LISTVIEW LEBIH TEPAT DIBANDING SINGLECHILDSCROLLVIEW
+        // ==========================================================
+        Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo.shade100,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Icon(
+                        Icons.analytics_outlined,
+                        color: Colors.indigo.shade800,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        '25. Kapan ListView Lebih Tepat daripada SingleChildScrollView?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(height: 20),
+                const Text(
+                  'Meskipun keduanya menyediakan fungsionalitas scroll, arsitektur internal keduanya sangat berbeda:',
+                  style: TextStyle(fontSize: 12.5, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+
+                // Poin SingleChildScrollView
+                _buildPointCard(
+                  title: 'Gunakan SingleChildScrollView Ketika:',
+                  color: Colors.purple,
+                  points: const [
+                    'Konten halaman memiliki struktur tetap dan pendek (hanya sedikit melebihi layar), seperti formulir pendaftaran, profil, dialog, atau kartu detail.',
+                    'Child berupa widget heterogen (kombinasi Card, Text, Form, Button, Image) yang dibungkus dalam Column.',
+                    'Semua widget perlu tetap ada di memori agar state (seperti input form dan validasi) tidak ter-reset saat digulir.',
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Poin ListView
+                _buildPointCard(
+                  title: 'Gunakan ListView (ListView.builder) Ketika:',
+                  color: Colors.indigo,
+                  points: const [
+                    'Data berjumlah banyak, dinamis, atau tidak terbatas (puluhan hingga ribuan item, misal: feed berita, daftar chat, katalog produk).',
+                    'Memerlukan optimasi memori melalui "Lazy Loading / Viewport Recycling", di mana hanya widget yang terlihat di layar yang dibuat dan dirender.',
+                    'Mencegah aplikasi mengalami jank, lag, atau out-of-memory saat data terus bertambah.',
+                  ],
+                ),
+                const SizedBox(height: 14),
+
+                // Tabel Ringkasan
+                Table(
+                  border: TableBorder.all(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  columnWidths: const {
+                    0: FlexColumnWidth(2.2),
+                    1: FlexColumnWidth(3),
+                    2: FlexColumnWidth(3),
+                  },
+                  children: [
+                    TableRow(
+                      decoration: BoxDecoration(color: Colors.grey.shade200),
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Kriteria',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'SingleChildScrollView',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: Colors.purple,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'ListView.builder',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: Colors.indigo,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    _buildTableRowItem(
+                      'Mekanisme Rendering',
+                      'Eager Loading (semua child dibuat sekaligus)',
+                      'Lazy Loading (on-demand saat masuk viewport)',
+                    ),
+                    _buildTableRowItem(
+                      'Konsumsi Memori',
+                      'Tinggi jika item bertambah banyak',
+                      'Rendah & konstan (mendaur ulang elemen)',
+                    ),
+                    _buildTableRowItem(
+                      'Kasus Penggunaan',
+                      'Formulir, Profil, Detail Statis',
+                      'Daftar Kursus, Feed, Pesan Chat',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ==========================================================================
+  // HELPER WIDGETS
+  // ==========================================================================
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    FocusNode? focusNode,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    String? helperText,
+  }) {
+    return TextField(
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.purple.shade700, size: 20),
+        helperText: helperText,
+        helperMaxLines: 2,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      ),
+    );
+  }
+
+  Widget _buildPointCard({
+    required String title,
+    required Color color,
+    required List<String> points,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 6),
+          ...points.map(
+            (pt) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '• ',
+                    style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                  ),
+                  Expanded(
+                    child: Text(
+                      pt,
+                      style: const TextStyle(fontSize: 12, height: 1.35),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  TableRow _buildTableRowItem(String param, String scVal, String lvVal) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            param,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            scVal,
+            style: const TextStyle(fontSize: 11, color: Colors.black87),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            lvVal,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Colors.indigo,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 
 
 
