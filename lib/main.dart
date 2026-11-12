@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap11Page(),
+      home: Tahap12Page(),
     );
   }
 
@@ -1671,6 +1671,25 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const Tahap11Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.touch_app_rounded,
+              color: currentTahap == 12 ? Colors.deepOrange : Colors.grey,
+            ),
+            title: const Text('Tahap 12: Button, InkWell, & Gesture'),
+            subtitle: const Text('Tap, Favorite State, & Long Press Gesture'),
+            selected: currentTahap == 12,
+            selectedTileColor: Colors.deepOrange.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 12) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap12Page()),
                 );
               }
             },
@@ -7998,5 +8017,624 @@ class Tahap11ProfileContent extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// TAHAP 12: BUTTON, INKWELL, DAN GESTUREDETECTOR
+// ============================================================================
+
+/// Halaman demonstrasi praktikum Tahap 12:
+/// - 47. Tambahkan aksi tap pada satu CourseCard.
+/// - 48. Tambahkan tombol favorite dengan state boolean.
+/// - 49. Gunakan icon berbeda untuk favorite aktif/nonaktif.
+/// - 50. Tambahkan satu gesture lain, misalnya long press untuk menampilkan informasi.
+class Tahap12Page extends StatefulWidget {
+  const Tahap12Page({super.key});
+
+  @override
+  State<Tahap12Page> createState() => _Tahap12PageState();
+}
+
+class _Tahap12PageState extends State<Tahap12Page> {
+  // 48. State boolean untuk status favorite kartu utama
+  bool isFavorite = false;
+
+  // Catatan log interaksi gesture terakhir untuk diobservasi
+  String _lastGestureDetected = 'Belum ada interaksi gesture.';
+  int _tapCount = 0;
+
+  // Data satu course utama untuk diuji coba
+  final Map<String, dynamic> sampleCourse = const {
+    'code': 'MOB03',
+    'title': 'Flutter UI Fundamentals',
+    'credits': 3,
+    'status': 'active',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 12),
+      appBar: AppBar(
+        title: const Text('Tahap 12: Button, InkWell & Gesture'),
+        backgroundColor: Colors.deepOrange.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.deepOrange.shade50.withValues(alpha: 0.25),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ==========================================================
+              // HEADER IDENTITAS MAHASISWA
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                color: Colors.deepOrange.shade800,
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.touch_app,
+                          color: Colors.deepOrange,
+                          size: 30,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Praktikum Mobile - Tahap 12',
+                              style: TextStyle(
+                                color: Colors.orangeAccent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              studentName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.5,
+                              ),
+                            ),
+                            Text(
+                              'NIM: $studentId  •  TRPL Undiksha',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // KARTU MATERI INTI TAHAP 12
+              // ==========================================================
+              Card(
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.deepOrange.shade200),
+                ),
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.swipe_outlined,
+                              color: Colors.deepOrange.shade800),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Materi: Button, InkWell, & GestureDetector',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.5,
+                              color: Colors.deepOrange.shade900,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 20),
+                      _buildGestureDocRow(
+                        type: 'Button',
+                        desc:
+                            'Aksi eksplisit dengan elevasi, padding, dan styling standar Material (misal tombol simpan, submit).',
+                        icon: Icons.smart_button,
+                        color: Colors.indigo,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildGestureDocRow(
+                        type: 'InkWell',
+                        desc:
+                            'Elemen Material dengan efek riak air (ripple effect) saat disentuh. Cocok untuk Card & ListTile.',
+                        icon: Icons.water_drop_outlined,
+                        color: Colors.teal,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildGestureDocRow(
+                        type: 'GestureDetector',
+                        desc:
+                            'Kontrol gesture serbaguna (tap, double tap, long press, pan, scale) tanpa efek visual bawaan Material.',
+                        icon: Icons.fingerprint,
+                        color: Colors.deepOrange,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // KARTU UTAMA TAHAP 12: INKWELL DENGAN AKSI TAP & LONG PRESS
+              // 47. Aksi tap pada satu CourseCard
+              // 48. Tombol favorite dengan state boolean
+              // 49. Icon berbeda untuk favorite aktif/nonaktif
+              // 50. Gesture lain (Long Press) untuk menampilkan informasi
+              // ==========================================================
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(
+                    color: isFavorite
+                        ? Colors.red.shade300
+                        : Colors.deepOrange.shade200,
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Header Status
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isFavorite
+                            ? Colors.red.shade50
+                            : Colors.grey.shade100,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(14),
+                          topRight: Radius.circular(14),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                isFavorite ? Icons.favorite : Icons.favorite_border,
+                                color: isFavorite ? Colors.red : Colors.grey,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                isFavorite
+                                    ? 'Status: Favorit Aktif (true)'
+                                    : 'Status: Belum Favorit (false)',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.5,
+                                  color: isFavorite
+                                      ? Colors.red.shade800
+                                      : Colors.grey.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // 48 & 49. Tombol Favorite dengan icon dinamis
+                          IconButton(
+                            tooltip: isFavorite
+                                ? 'Hapus dari Favorit'
+                                : 'Jadikan Favorit',
+                            // 49. Icon berbeda untuk aktif vs nonaktif
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isFavorite ? Colors.red : Colors.grey.shade600,
+                              size: 26,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                isFavorite = !isFavorite;
+                                _lastGestureDetected = isFavorite
+                                    ? 'Tombol Favorite ditekan: Menjadi Aktif (true)'
+                                    : 'Tombol Favorite ditekan: Menjadi Nonaktif (false)';
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 47, 48, 49, & 50: INKWELL MEMBUNGKUS COURSECARD
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(14),
+                          bottomRight: Radius.circular(14),
+                        ),
+                        splashColor: Colors.deepOrange.withValues(alpha: 0.15),
+                        highlightColor: Colors.deepOrange.withValues(alpha: 0.08),
+                        // 47 & 48. Aksi Tap pada CourseCard (Toggle Favorite)
+                        onTap: () {
+                          setState(() {
+                            isFavorite = !isFavorite;
+                            _tapCount++;
+                            _lastGestureDetected =
+                                'Tap terdeteksi pada CourseCard! Favorite: $isFavorite (Total Tap: $_tapCount)';
+                          });
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  Icon(
+                                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    isFavorite
+                                        ? 'Ditambahkan ke Favorit! (true)'
+                                        : 'Dihapus dari Favorit! (false)',
+                                  ),
+                                ],
+                              ),
+                              backgroundColor:
+                                  isFavorite ? Colors.red.shade700 : Colors.grey.shade800,
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        // 50. Gesture Lain: Long Press untuk Menampilkan Informasi
+                        onLongPress: () {
+                          setState(() {
+                            _lastGestureDetected =
+                                'Gesture: Long Press terdeteksi pada CourseCard!';
+                          });
+                          _showCourseDetailModal(context, sampleCourse);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: CourseCard(course: sampleCourse),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Kartu Petunjuk Gesture Interaktif
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.touch_app, size: 16, color: Colors.deepOrange),
+                        SizedBox(width: 6),
+                        Text(
+                          'Petunjuk Pengujian Gesture:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.5,
+                            color: Colors.deepOrange,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    _buildBulletText('47 & 48. Tap kartu di atas untuk mengubah state isFavorite.'),
+                    _buildBulletText('49. Perhatikan ikon hati berubah warna dan bentuk (aktif/nonaktif).'),
+                    _buildBulletText('50. Tekan dan tahan kartu (Long Press) untuk menampilkan modal informasi.'),
+                    const Divider(height: 16),
+                    Row(
+                      children: [
+                        const Icon(Icons.history, size: 15, color: Colors.grey),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Log Terakhir: $_lastGestureDetected',
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 11,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // DEMONSTRASI GESTUREDETECTOR VS BUTTON
+              // ==========================================================
+              Card(
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Eksplorasi: GestureDetector (Double Tap & Drag)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'GestureDetector mendeteksi gesture tanpa efek visual Material bawaan:',
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Box dengan GestureDetector
+                      GestureDetector(
+                        onDoubleTap: () {
+                          setState(() {
+                            isFavorite = true;
+                            _lastGestureDetected =
+                                'GestureDetector: Double Tap terdeteksi! (Otomatis Favorit)';
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Double Tap terdeteksi! (Quick Like)'),
+                              duration: Duration(milliseconds: 900),
+                            ),
+                          );
+                        },
+                        onTap: () {
+                          setState(() {
+                            _lastGestureDetected =
+                                'GestureDetector: Single Tap pada custom box';
+                          });
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.indigo.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.indigo.shade200),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.touch_app_outlined,
+                                  color: Colors.indigo.shade700, size: 28),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'Area GestureDetector Kustom',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: Colors.indigo,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              const Text(
+                                'Ketuk dua kali (Double Tap) di sini untuk Quick Like!',
+                                style: TextStyle(fontSize: 11.5, color: Colors.black54),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Tombol Eksplisit (Button)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepOrange.shade800,
+                                foregroundColor: Colors.white,
+                              ),
+                              icon: const Icon(Icons.refresh, size: 18),
+                              label: const Text('Reset Favorite'),
+                              onPressed: () {
+                                setState(() {
+                                  isFavorite = false;
+                                  _tapCount = 0;
+                                  _lastGestureDetected = 'State favorite di-reset.';
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ==========================================================================
+  // 50. MODAL INFORMASI YANG DITAMPILKAN SAAT GESTURE LONG PRESS
+  // ==========================================================================
+  void _showCourseDetailModal(BuildContext context, Map<String, dynamic> course) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.deepOrange.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.info_outline,
+                        color: Colors.deepOrange.shade800, size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '50. Gesture: Long Press Berhasil!',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.deepOrange,
+                          ),
+                        ),
+                        Text(
+                          'Informasi detail kursus dibuka melalui long press',
+                          style: TextStyle(fontSize: 11.5, color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(height: 24),
+              _buildModalRow('Kode Kursus', '${course['code']}'),
+              _buildModalRow('Judul Materi', '${course['title']}'),
+              _buildModalRow('Beban SKS', '${course['credits']} SKS'),
+              _buildModalRow('Status Pembelajaran', '${course['status']}'),
+              _buildModalRow('Identitas Mahasiswa', '$studentName ($studentId)'),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange.shade800,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Tutup Informasi'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildModalRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGestureDocRow({
+    required String type,
+    required String desc,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(fontSize: 12, color: Colors.black87, height: 1.35),
+              children: [
+                TextSpan(
+                  text: '$type: ',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: color),
+                ),
+                TextSpan(text: desc),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBulletText(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 11.5, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 
