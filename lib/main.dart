@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap4Page(),
+      home: Tahap5Page(),
     );
   }
 
@@ -1538,6 +1538,25 @@ class AppDrawer extends StatelessWidget {
               }
             },
           ),
+          ListTile(
+            leading: Icon(
+              Icons.grid_view_rounded,
+              color: currentTahap == 5 ? Colors.deepOrange : Colors.grey,
+            ),
+            title: const Text('Tahap 5: GridView Responsif'),
+            subtitle: const Text('1, 2, & 3 Kolom Berdasarkan Lebar Layar'),
+            selected: currentTahap == 5,
+            selectedTileColor: Colors.deepOrange.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 5) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap5Page()),
+                );
+              }
+            },
+          ),
         ],
       ),
     );
@@ -1901,7 +1920,7 @@ class _Tahap4PageState extends State<Tahap4Page> {
                                     horizontal: 8,
                                     vertical: 4,
                                   ),
-                                  margin: const EdgeInsets.bottom(8),
+                                  margin: const EdgeInsets.only(bottom: 8),
                                   color: Colors.teal.shade100,
                                   child: Text(
                                     'Container Terbatas: ${_simulatedContainerWidth.toStringAsFixed(1)} dp',
@@ -2756,5 +2775,622 @@ class _Tahap4PageState extends State<Tahap4Page> {
     );
   }
 }
+
+// ============================================================================
+// TAHAP 5: GRIDVIEW RESPONSIF
+// ============================================================================
+
+/// Fungsi penentu jumlah kolom berdasarkan breakpoint lebar layar (Materi Tahap 5):
+/// - Compact (< 600 dp)  : 1 Kolom
+/// - Medium (600–839 dp) : 2 Kolom
+/// - Expanded (>= 840 dp): 3 Kolom
+int columnsFor(double width) {
+  if (width < 600) return 1;
+  if (width < 840) return 2;
+  return 3;
+}
+
+/// Helper untuk menentukan rasio aspek kartu agar proporsional dan bebas overflow
+double childAspectRatioFor(int columns) {
+  if (columns == 1) return 2.6;
+  if (columns == 2) return 1.55;
+  return 1.4;
+}
+
+/// Fallback data jika JSON belum selesai dimuat atau terjadi kendala I/O
+final List<Map<String, dynamic>> fallbackCourses = const [
+  {
+    'code': 'MOB01',
+    'title': 'Git & GitHub',
+    'credits': 2,
+    'status': 'done',
+  },
+  {
+    'code': 'MOB02',
+    'title': 'Dart Fundamentals',
+    'credits': 2,
+    'status': 'done',
+  },
+  {
+    'code': 'MOB03',
+    'title': 'Flutter UI Fundamentals',
+    'credits': 3,
+    'status': 'active',
+  },
+  {
+    'code': 'MOB04',
+    'title': 'Navigation',
+    'credits': 2,
+    'status': 'planned',
+  },
+  {
+    'code': 'MOB05',
+    'title': 'State Management',
+    'credits': 3,
+    'status': 'planned',
+  },
+  {
+    'code': 'MOB06',
+    'title': 'Testing & Deployment',
+    'credits': 2,
+    'status': 'planned',
+  },
+];
+
+/// Halaman demonstrasi praktikum Tahap 5: GridView Responsif
+/// - 18. Gunakan data course dari collection/JSON pertemuan sebelumnya.
+/// - 19. Tampilkan course sebagai GridView.
+/// - 20. Atur 1 kolom pada compact, 2 pada medium, dan 3 pada expanded.
+/// - 21. Pastikan Nama dan NIM tetap terlihat pada header.
+class Tahap5Page extends StatefulWidget {
+  const Tahap5Page({super.key});
+
+  @override
+  State<Tahap5Page> createState() => _Tahap5PageState();
+}
+
+class _Tahap5PageState extends State<Tahap5Page> {
+  // Kontrol simulasi slider lebar layar untuk pengujian breakpoint secara dinamis
+  bool _enableSimulatedResize = false;
+  double _simulatedContainerWidth = 480.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final physicalWidth = mediaQuery.size.width;
+
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 5),
+      appBar: AppBar(
+        title: const Text('Tahap 5: GridView Responsif'),
+        backgroundColor: Colors.deepOrange.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.grey.shade100,
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: loadStudentData(),
+          builder: (context, snapshot) {
+            // 18. Mengambil data courses dan student dari JSON / Fallback
+            List<dynamic> courses = fallbackCourses;
+            String headerName = studentName;
+            String headerNim = studentId;
+            String headerMajor = 'Teknologi Rekayasa Perangkat Lunak';
+
+            if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data!;
+              if (data['courses'] is List) {
+                courses = data['courses'] as List<dynamic>;
+              }
+              if (data['student'] is Map) {
+                final studentMap = data['student'] as Map<String, dynamic>;
+                headerName = studentMap['name']?.toString() ?? studentName;
+                headerNim = studentMap['nim']?.toString() ?? studentId;
+                headerMajor = studentMap['major']?.toString() ?? headerMajor;
+              }
+            }
+
+            final int totalCredits = courses.fold<int>(
+              0,
+              (sum, item) => sum + (((item as Map)['credits'] as num?)?.toInt() ?? 0),
+            );
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ========================================================
+                // 21. HEADER: NAMA DAN NIM TETAP TERLIHAT DI BAGIAN ATAS
+                // ========================================================
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Kartu Identitas Mahasiswa
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.deepOrange.shade800,
+                              Colors.deepOrange.shade600,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const CircleAvatar(
+                              radius: 26,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.deepOrange,
+                                size: 30,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Praktikum Mobile - Tahap 5',
+                                    style: TextStyle(
+                                      color: Colors.orangeAccent,
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    headerName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  Text(
+                                    'NIM: $headerNim  •  $headerMajor',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Ringkasan Statistik Singkat & Kontrol Breakpoint
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildHeaderBadge(
+                              icon: Icons.menu_book,
+                              label: 'Mata Kuliah',
+                              value: '${courses.length} Kursus',
+                              color: Colors.deepOrange,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildHeaderBadge(
+                              icon: Icons.stars,
+                              label: 'Total Beban',
+                              value: '$totalCredits SKS',
+                              color: Colors.indigo,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Tombol Slider Simulasi Ukuran Layar
+                          IconButton.filledTonal(
+                            tooltip: 'Simulasi Ukuran Layar / Breakpoint',
+                            icon: Icon(
+                              _enableSimulatedResize
+                                  ? Icons.tune
+                                  : Icons.tune_outlined,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _enableSimulatedResize = !_enableSimulatedResize;
+                                if (_enableSimulatedResize) {
+                                  _simulatedContainerWidth =
+                                      physicalWidth.clamp(320.0, 900.0);
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+
+                      // Slider simulasi breakpoint responsif jika aktif
+                      if (_enableSimulatedResize) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.orange.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Simulasi Lebar: ${_simulatedContainerWidth.toStringAsFixed(0)} dp',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.deepOrange.shade900,
+                                    ),
+                                  ),
+                                  Text(
+                                    _simulatedContainerWidth < 600
+                                        ? 'Mode: Compact (1 Kolom)'
+                                        : (_simulatedContainerWidth < 840
+                                            ? 'Mode: Medium (2 Kolom)'
+                                            : 'Mode: Expanded (3 Kolom)'),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.deepOrange.shade800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Slider(
+                                value: _simulatedContainerWidth,
+                                min: 320.0,
+                                max: physicalWidth > 900
+                                    ? physicalWidth
+                                    : 900.0,
+                                divisions: 29,
+                                activeColor: Colors.deepOrange,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _simulatedContainerWidth = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+
+                // ========================================================
+                // 19 & 20. GRIDVIEW RESPONSIF (1, 2, ATAU 3 KOLOM)
+                // ========================================================
+                Expanded(
+                  child: Center(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: _enableSimulatedResize
+                          ? _simulatedContainerWidth
+                          : double.infinity,
+                      decoration: _enableSimulatedResize
+                          ? BoxDecoration(
+                              border: Border.symmetric(
+                                vertical: BorderSide(
+                                  color: Colors.deepOrange.shade300,
+                                  width: 2,
+                                ),
+                              ),
+                            )
+                          : null,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // 20. Penentuan jumlah kolom menggunakan columnsFor(constraints.maxWidth)
+                          final double effectiveWidth = constraints.maxWidth;
+                          final int columns = columnsFor(effectiveWidth);
+                          final double aspectRatio = childAspectRatioFor(columns);
+
+                          String layoutCategory;
+                          Color badgeColor;
+                          if (columns == 1) {
+                            layoutCategory = 'Compact (< 600 dp) → 1 Kolom';
+                            badgeColor = Colors.orange.shade700;
+                          } else if (columns == 2) {
+                            layoutCategory = 'Medium (600–839 dp) → 2 Kolom';
+                            badgeColor = Colors.teal.shade700;
+                          } else {
+                            layoutCategory = 'Expanded (>= 840 dp) → 3 Kolom';
+                            badgeColor = Colors.indigo.shade700;
+                          }
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Status Banner Breakpoint Saat Ini
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                color: badgeColor.withValues(alpha: 0.1),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.dashboard_customize,
+                                          size: 16,
+                                          color: badgeColor,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          layoutCategory,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: badgeColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      'Lebar: ${effectiveWidth.toStringAsFixed(1)} dp',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey.shade700,
+                                        fontFamily: 'monospace',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // 19. GridView.builder Sesuai Perintah Praktikum
+                              Expanded(
+                                child: GridView.builder(
+                                  padding: const EdgeInsets.all(12),
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: columnsFor(effectiveWidth),
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: aspectRatio,
+                                  ),
+                                  itemCount: courses.length,
+                                  itemBuilder: (context, index) {
+                                    final courseMap =
+                                        courses[index] as Map<String, dynamic>;
+                                    return CourseCard(course: courseMap);
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderBadge({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade700),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// WIDGET COURSE CARD (UNTUK TAHAP 5 GRIDVIEW)
+// ============================================================================
+
+class CourseCard extends StatelessWidget {
+  final Map<String, dynamic> course;
+  const CourseCard({super.key, required this.course});
+
+  @override
+  Widget build(BuildContext context) {
+    final String code = course['code']?.toString() ?? 'MOB';
+    final String title = course['title']?.toString() ?? 'Course Title';
+    final int credits = (course['credits'] as num?)?.toInt() ?? 2;
+    final String status = course['status']?.toString() ?? 'planned';
+
+    Color statusColor;
+    IconData statusIcon;
+    String statusLabel;
+
+    switch (status.toLowerCase()) {
+      case 'done':
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle_rounded;
+        statusLabel = 'Selesai';
+        break;
+      case 'active':
+        statusColor = Colors.blue;
+        statusIcon = Icons.play_circle_fill_rounded;
+        statusLabel = 'Aktif';
+        break;
+      default:
+        statusColor = Colors.orange;
+        statusIcon = Icons.schedule_rounded;
+        statusLabel = 'Rencana';
+    }
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: statusColor.withValues(alpha: 0.35),
+          width: 1.2,
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            colors: [Colors.white, statusColor.withValues(alpha: 0.05)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Baris Atas: Kode Kursus & Badge Status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    code,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11.5,
+                      color: statusColor,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(statusIcon, size: 12, color: statusColor),
+                      const SizedBox(width: 4),
+                      Text(
+                        statusLabel,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.bold,
+                          color: statusColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // Judul Kursus
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Color(0xFF1E293B),
+                ),
+              ),
+            ),
+
+            // Baris Bawah: Info SKS
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.credit_card, size: 13, color: Colors.grey.shade600),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$credits SKS',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 11,
+                  color: Colors.grey.shade400,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 
