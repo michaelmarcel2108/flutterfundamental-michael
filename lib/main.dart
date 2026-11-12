@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap3Page(),
+      home: Tahap4Page(),
     );
   }
 
@@ -384,6 +384,7 @@ class _Tahap1PageState extends State<Tahap1Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(currentTahap: 1),
       appBar: AppBar(
         title: const Text('Tahap 1: Pengamatan Layout'),
         backgroundColor: Colors.blue,
@@ -567,6 +568,7 @@ class Tahap2Page extends StatelessWidget {
     final isCompact = size.width < 600;
 
     return Scaffold(
+      drawer: const AppDrawer(currentTahap: 2),
       appBar: AppBar(
         title: const Text('Tahap 2: MediaQuery'),
         backgroundColor: Colors.indigo,
@@ -692,6 +694,7 @@ class Tahap3Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(currentTahap: 3),
       appBar: AppBar(
         title: const Text('Tahap 3: LayoutBuilder & Breakpoint'),
         backgroundColor: Colors.indigo,
@@ -1399,4 +1402,1359 @@ Widget _buildMiniStat(String label, String value) {
     ),
   );
 }
+
+// ============================================================================
+// APP DRAWER (NAVIGASI SELURUH TAHAP PRAKTIKUM)
+// ============================================================================
+
+class AppDrawer extends StatelessWidget {
+  final int currentTahap;
+  const AppDrawer({super.key, required this.currentTahap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.teal.shade800, Colors.indigo.shade800],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.school, color: Colors.indigo, size: 28),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  studentName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  'NIM: $studentId',
+                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'TRPL Undiksha - Mobile',
+                    style: TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.warning_amber_rounded,
+              color: currentTahap == 1 ? Colors.blue : Colors.grey,
+            ),
+            title: const Text('Tahap 1: Pengamatan Layout'),
+            subtitle: const Text('Overflow & Scrollable Fix'),
+            selected: currentTahap == 1,
+            selectedTileColor: Colors.blue.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 1) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap1Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.screen_search_desktop,
+              color: currentTahap == 2 ? Colors.indigo : Colors.grey,
+            ),
+            title: const Text('Tahap 2: MediaQuery'),
+            subtitle: const Text('Screen Size & Orientation'),
+            selected: currentTahap == 2,
+            selectedTileColor: Colors.indigo.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 2) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap2Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.view_quilt,
+              color: currentTahap == 3 ? Colors.indigo : Colors.grey,
+            ),
+            title: const Text('Tahap 3: LayoutBuilder & Breakpoint'),
+            subtitle: const Text('Compact, Medium, & Expanded'),
+            selected: currentTahap == 3,
+            selectedTileColor: Colors.indigo.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 3) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap3Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.view_week,
+              color: currentTahap == 4 ? Colors.teal : Colors.grey,
+            ),
+            title: const Text('Tahap 4: Expanded, Flexible, & Wrap'),
+            subtitle: const Text('Flex 2:1, Wrap Chips, & Overflow Analysis'),
+            selected: currentTahap == 4,
+            selectedTileColor: Colors.teal.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 4) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap4Page()),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// TAHAP 4: EXPANDED, FLEXIBLE, DAN WRAP
+// ============================================================================
+
+/// Halaman demonstrasi praktikum Tahap 4:
+/// - 14. Dua panel dalam Row menggunakan Expanded dengan flex 2:1.
+/// - 15. Ubah ukuran layar dan amati pembagian ruang.
+/// - 16. Minimal enam Chip skill menggunakan Wrap.
+/// - 17. Bandingkan dengan Row biasa ketika ruang tidak cukup.
+class Tahap4Page extends StatefulWidget {
+  const Tahap4Page({super.key});
+
+  @override
+  State<Tahap4Page> createState() => _Tahap4PageState();
+}
+
+class _Tahap4PageState extends State<Tahap4Page> {
+  // 16. Minimal enam Chip skill menggunakan Wrap (disediakan 8 skill)
+  final List<String> skills = const [
+    'Flutter',
+    'Dart',
+    'Git & GitHub',
+    'REST API',
+    'Responsive UI',
+    'State Management',
+    'Firebase',
+    'Clean Architecture',
+  ];
+
+  // 15. State untuk pengujian perubahan ukuran layar/container secara interaktif
+  bool _enableSimulatedResize = false;
+  double _simulatedContainerWidth = 420.0;
+
+  // 17. View mode untuk perbandingan Wrap vs Row biasa
+  // 0: Wrap (Auto multiline), 1: Row Biasa (Overflow demo), 2: Berdampingan (Side-by-side)
+  int _comparisonMode = 0;
+
+  // State demonstrasi perbedaan Flexible vs Expanded
+  bool _useExpandedOverFlexible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 4),
+      appBar: AppBar(
+        title: const Text('Tahap 4: Expanded, Flexible, & Wrap'),
+        backgroundColor: Colors.teal.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.blueGrey.shade50,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ==========================================================
+              // HEADER & IDENTITAS MAHASISWA
+              // ==========================================================
+              Card(
+                color: Colors.teal.shade800,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.person, color: Colors.teal, size: 32),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Praktikum Mobile - Tahap 4',
+                              style: TextStyle(
+                                color: Colors.tealAccent,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              studentName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'NIM: $studentId',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // KARTU MATERI INTI TAHAP 4
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.menu_book, color: Colors.teal.shade800),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Materi: Expanded, Flexible, dan Wrap',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.teal.shade900,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 20),
+                      _buildMateriPoint(
+                        title: 'Expanded',
+                        description:
+                            'Mengambil sisa ruang pada sumbu utama (main axis) secara ketat (tight fit) sesuai proporsi bobot `flex`.',
+                        icon: Icons.unfold_more,
+                        color: Colors.deepPurple,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildMateriPoint(
+                        title: 'Flexible',
+                        description:
+                            'Memberi ruang yang lebih longgar (loose fit); child hanya menggunakan ruang sebesar kontennya maksimal sebesar porsi flex.',
+                        icon: Icons.open_in_full,
+                        color: Colors.indigo,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildMateriPoint(
+                        title: 'Wrap',
+                        description:
+                            'Mengalirkan child secara berurutan dan otomatis memindahkannya ke baris/kolom berikutnya (new run) ketika ruang tidak cukup.',
+                        icon: Icons.wrap_text,
+                        color: Colors.teal,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ==========================================================
+              // BUTIR 14 & 15: DUA PANEL DALAM ROW DENGAN EXPANDED FLEX 2:1
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurple.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.view_column_rounded,
+                              color: Colors.deepPurple.shade800,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '14 & 15. Dua Panel Row (Expanded Flex 2:1)',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text(
+                                  'Rasio pembagian ruang: Panel A = 2 bagian (66.7%), Panel B = 1 bagian (33.3%)',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Code Snippet Box
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E2E),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Row(\n'
+                          '  children: [\n'
+                          '    Expanded(flex: 2, child: buildBox(\'A\')),\n'
+                          '    const SizedBox(width: 8),\n'
+                          '    Expanded(child: buildBox(\'B\')),\n'
+                          '  ],\n'
+                          ')',
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            color: Color(0xFF89DDFF),
+                            fontSize: 12.5,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Fitur Interaktif Butir 15: Kontrol Simulasi Resize Layar
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.teal.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.teal.shade200),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.tune, size: 18, color: Colors.teal),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      '15. Amati Pembagian Ruang:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        color: Colors.teal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Switch(
+                                  value: _enableSimulatedResize,
+                                  activeColor: Colors.teal,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _enableSimulatedResize = val;
+                                      if (val) {
+                                        _simulatedContainerWidth =
+                                            (screenWidth * 0.85).clamp(280.0, 700.0);
+                                      }
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            Text(
+                              _enableSimulatedResize
+                                  ? 'Mode Simulasi Ukuran Aktif: Geser slider di bawah atau ubah ukuran jendela desktop/browser untuk mengamati pembagian ruang proporsional.'
+                                  : 'Menggunakan lebar layar penuh (${screenWidth.toStringAsFixed(1)} dp). Aktifkan switch untuk menguji simulasi slider ukuran layar.',
+                              style: const TextStyle(fontSize: 12, color: Colors.black87),
+                            ),
+                            if (_enableSimulatedResize) ...[
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Lebar: ${_simulatedContainerWidth.toStringAsFixed(0)} dp',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Slider(
+                                      value: _simulatedContainerWidth,
+                                      min: 260.0,
+                                      max: screenWidth > 320 ? screenWidth : 320.0,
+                                      divisions: 30,
+                                      label: '${_simulatedContainerWidth.toStringAsFixed(0)} dp',
+                                      activeColor: Colors.teal,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _simulatedContainerWidth = val;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Implementasi Butir 14: Dua panel dalam Row menggunakan Expanded dengan flex 2:1
+                      Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: _enableSimulatedResize
+                              ? _simulatedContainerWidth
+                              : double.infinity,
+                          decoration: BoxDecoration(
+                            border: _enableSimulatedResize
+                                ? Border.all(color: Colors.teal, width: 2)
+                                : null,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: _enableSimulatedResize
+                              ? const EdgeInsets.all(8)
+                              : EdgeInsets.zero,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (_enableSimulatedResize) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  margin: const EdgeInsets.bottom(8),
+                                  color: Colors.teal.shade100,
+                                  child: Text(
+                                    'Container Terbatas: ${_simulatedContainerWidth.toStringAsFixed(1)} dp',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal.shade900,
+                                    ),
+                                  ),
+                                ),
+                              ],
+
+                              // 14. Row dengan Expanded flex 2:1
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: buildBox('A', flex: 2),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    flex: 1, // default Expanded adalah flex: 1
+                                    child: buildBox('B', flex: 1),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Catatan Pengamatan Pembagian Ruang (Butir 15)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.info_outline, size: 18, color: Colors.indigo),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Hasil Observasi Pembagian Ruang (Butir 15):',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: Colors.indigo,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            _buildBullet(
+                              'Total bobot flex adalah 2 + 1 = 3 bagian.',
+                            ),
+                            _buildBullet(
+                              'Panel A (flex: 2) selalu menerima 2/3 (sekitar 66.7%) dari sisa lebar setelah dipotong SizedBox 8 dp.',
+                            ),
+                            _buildBullet(
+                              'Panel B (flex: 1) selalu menerima 1/3 (sekitar 33.3%) dari sisa lebar.',
+                            ),
+                            _buildBullet(
+                              'Saat layar diubah (resize), kedua panel secara otomatis dan proporsional menyesuaikan lebarnya tanpa menyebabkan overflow.',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ==========================================================
+              // MATERI PENDUKUNG: PERBEDAAN EXPANDED VS FLEXIBLE
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.compare_arrows, color: Colors.deepPurple.shade700),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Eksplorasi Materi: Expanded vs Flexible',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Expanded menggunakan FlexFit.tight (memaksa child selebar alokasi flex), sedangkan Flexible menggunakan FlexFit.loose secara default (child hanya selebar kontennya jika konten lebih kecil).',
+                        style: TextStyle(fontSize: 12.5, color: Colors.black87),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          ChoiceChip(
+                            label: const Text('Gunakan Expanded (Tight Fit)'),
+                            selected: _useExpandedOverFlexible,
+                            selectedColor: Colors.deepPurple.shade100,
+                            onSelected: (val) {
+                              if (val) setState(() => _useExpandedOverFlexible = true);
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ChoiceChip(
+                            label: const Text('Gunakan Flexible (Loose Fit)'),
+                            selected: !_useExpandedOverFlexible,
+                            selectedColor: Colors.indigo.shade100,
+                            onSelected: (val) {
+                              if (val) setState(() => _useExpandedOverFlexible = false);
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Row(
+                          children: [
+                            if (_useExpandedOverFlexible)
+                              Expanded(
+                                flex: 2,
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  color: Colors.deepPurple.shade200,
+                                  child: const Text(
+                                    'Expanded: Mengisi penuh porsi flex 2',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            else
+                              Flexible(
+                                flex: 2,
+                                fit: FlexFit.loose,
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  color: Colors.indigo.shade200,
+                                  child: const Text(
+                                    'Flexible: Hanya selebar teks ini',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                color: Colors.grey.shade300,
+                                child: const Text(
+                                  'Panel Pendamping',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ==========================================================
+              // BUTIR 16: MINIMAL ENAM CHIP SKILL MENGGUNAKAN WRAP
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.teal.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.loyalty_rounded,
+                              color: Colors.teal.shade800,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  '16. Minimal Enam Chip Skill (Wrap)',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text(
+                                  'Terdapat ${skills.length} skills (>= 6) dengan spacing: 8 dan runSpacing: 8',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Code Snippet Box Sesuai Perintah
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E2E),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Wrap(\n'
+                          '  spacing: 8,\n'
+                          '  runSpacing: 8,\n'
+                          '  children: skills.map((e) => Chip(label: Text(e))).toList(),\n'
+                          ')',
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            color: Color(0xFF89DDFF),
+                            fontSize: 12.5,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 16. Implementasi Nyata Sesuai Format Tugas
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.teal.shade50.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.teal.shade200),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.check_circle, size: 16, color: Colors.teal),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Tampilan Hasil Widget Wrap:',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: Colors.teal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Implementasi Wrap
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: skills
+                                  .map(
+                                    (e) => Chip(
+                                      avatar: CircleAvatar(
+                                        backgroundColor: Colors.teal.shade700,
+                                        child: Text(
+                                          e[0],
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      label: Text(
+                                        e,
+                                        style: TextStyle(
+                                          color: Colors.teal.shade900,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      side: BorderSide(
+                                        color: Colors.teal.shade300,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ==========================================================
+              // BUTIR 17: BANDINGKAN DENGAN ROW BIASA KETIKA RUANG TIDAK CUKUP
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.compare,
+                              color: Colors.red.shade800,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '17. Bandingkan dengan Row Biasa (Overflow)',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text(
+                                  'Analisis perilaku ketika ruang horizontal terbatas',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Filter Segmented / Pilihan Perbandingan
+                      SegmentedButton<int>(
+                        segments: const [
+                          ButtonSegment(
+                            value: 0,
+                            label: Text('Wrap (Rapi)'),
+                            icon: Icon(Icons.check_circle_outline),
+                          ),
+                          ButtonSegment(
+                            value: 1,
+                            label: Text('Row (Overflow)'),
+                            icon: Icon(Icons.warning_amber_rounded),
+                          ),
+                          ButtonSegment(
+                            value: 2,
+                            label: Text('Berdampingan'),
+                            icon: Icon(Icons.splitscreen),
+                          ),
+                        ],
+                        selected: {_comparisonMode},
+                        onSelectionChanged: (val) {
+                          setState(() {
+                            _comparisonMode = val.first;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Tampilan Berdasarkan Pilihan
+                      if (_comparisonMode == 0 || _comparisonMode == 2) ...[
+                        _buildComparisonCard(
+                          title: '1. Menggunakan Wrap (Solusi Responsif)',
+                          subtitle:
+                              'Chip otomatis pindah ke baris berikutnya (multiline). Bebas dari overflow error.',
+                          isPositive: true,
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: skills
+                                .map((e) => Chip(label: Text(e)))
+                                .toList(),
+                          ),
+                        ),
+                      ],
+
+                      if (_comparisonMode == 2) const SizedBox(height: 16),
+
+                      if (_comparisonMode == 1 || _comparisonMode == 2) ...[
+                        _buildComparisonCard(
+                          title: '2. Menggunakan Row Biasa (Masalah Layout)',
+                          subtitle:
+                              'Row memaksa seluruh child berada dalam 1 baris tak terbatas. Menyebabkan RenderFlex Overflowed.',
+                          isPositive: false,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Container simulasi dengan batas lebar tertentu agar overflow teramati jelas
+                              Container(
+                                width: double.infinity,
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.red.shade300),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      child: Row(
+                                        children: skills
+                                            .map((e) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(right: 8),
+                                                  child: Chip(label: Text(e)),
+                                                ))
+                                            .toList(),
+                                      ),
+                                    ),
+                                    // Visual Overflow Warning khas Flutter (Yellow-Black Striped Banner)
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      bottom: 0,
+                                      width: 44,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.yellow.shade700,
+                                              Colors.black,
+                                              Colors.yellow.shade700,
+                                              Colors.black,
+                                              Colors.yellow.shade700,
+                                            ],
+                                            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                                            tileMode: TileMode.repeated,
+                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              blurRadius: 4,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.red.shade200),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                      size: 16,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'A RenderFlex overflowed by 186 pixels on the right.',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11.5,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+
+                      // Tabel Komparasi Komprehensif
+                      _buildComparisonTable(),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ==========================================================================
+  // WIDGET HELPER BUILD BOX (SESUAI PERINTAH MATERI 14)
+  // ==========================================================================
+  Widget buildBox(String label, {Color? color, String? subtitle, int? flex}) {
+    final bool isA = label == 'A';
+    final Color primaryColor = isA ? Colors.deepPurple : Colors.amber.shade800;
+    final Color bgColor = isA ? Colors.deepPurple.shade50 : Colors.amber.shade50;
+    final Color borderColor = isA ? Colors.deepPurple.shade300 : Colors.amber.shade300;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double currentWidth = constraints.maxWidth;
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: borderColor, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: primaryColor.withValues(alpha: 0.1),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: primaryColor,
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Panel $label',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: primaryColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  isA ? 'flex: 2 (2/3 ~66.7%)' : 'flex: 1 (1/3 ~33.3%)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Text(
+                  '${currentWidth.toStringAsFixed(1)} dp',
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ==========================================================================
+  // HELPER WIDGETS
+  // ==========================================================================
+  Widget _buildMateriPoint({
+    required String title,
+    required String description,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icon, size: 18, color: color),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: color,
+                ),
+              ),
+              Text(
+                description,
+                style: const TextStyle(fontSize: 12, height: 1.3),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBullet(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 12.5, height: 1.35),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComparisonCard({
+    required String title,
+    required String subtitle,
+    required bool isPositive,
+    required Widget child,
+  }) {
+    final Color themeColor = isPositive ? Colors.teal : Colors.red;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isPositive ? Colors.teal.shade50.withValues(alpha: 0.4) : Colors.red.shade50.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: themeColor.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isPositive ? Icons.check_circle : Icons.error,
+                size: 18,
+                color: themeColor,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13.5,
+                    color: themeColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: const TextStyle(fontSize: 12, color: Colors.black87),
+          ),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComparisonTable() {
+    return Table(
+      border: TableBorder.all(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(8)),
+      columnWidths: const {
+        0: FlexColumnWidth(2.2),
+        1: FlexColumnWidth(3),
+        2: FlexColumnWidth(3),
+      },
+      children: [
+        TableRow(
+          decoration: BoxDecoration(color: Colors.grey.shade200),
+          children: const [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Parameter',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Row Biasa',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.red),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Wrap Widget',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.teal),
+              ),
+            ),
+          ],
+        ),
+        _buildTableRow(
+          'Jumlah Baris',
+          'Tepat 1 baris horizontal',
+          'Dinamis (banyak baris / multiline)',
+        ),
+        _buildTableRow(
+          'Jika Ruang Kurang',
+          'Overflow (RenderFlex error)',
+          'Otomatis wrap ke baris baru',
+        ),
+        _buildTableRow(
+          'Pengaturan Spacing',
+          'Perlu SizedBox / Spacer manual',
+          'Otomatis lewat spacing & runSpacing',
+        ),
+        _buildTableRow(
+          'Skenario Terbaik',
+          'Navigasi, Icon + Teks tetap',
+          'Daftar Chip, Tag, Kategori, Filter',
+        ),
+      ],
+    );
+  }
+
+  TableRow _buildTableRow(String param, String rowVal, String wrapVal) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            param,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11.5),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            rowVal,
+            style: const TextStyle(fontSize: 11.5, color: Colors.black87),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            wrapVal,
+            style: const TextStyle(fontSize: 11.5, color: Colors.teal, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 
