@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap6Page(),
+      home: HomePage(),
     );
   }
 
@@ -1572,6 +1572,25 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const Tahap6Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.navigation_rounded,
+              color: currentTahap == 7 ? Colors.indigo : Colors.grey,
+            ),
+            title: const Text('Tahap 7: Navigator (Push & Pop)'),
+            subtitle: const Text('Route Stack & AppBar Back Button'),
+            selected: currentTahap == 7,
+            selectedTileColor: Colors.indigo.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 7) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomePage()),
                 );
               }
             },
@@ -4270,6 +4289,664 @@ class _Tahap6PageState extends State<Tahap6Page> {
     );
   }
 }
+
+// ============================================================================
+// TAHAP 7: NAVIGATOR.PUSH() DAN NAVIGATOR.POP()
+// ============================================================================
+
+/// Alias untuk fleksibilitas pemanggilan halaman Tahap 7
+typedef Tahap7Page = HomePage;
+
+/// 26. HomePage untuk Tahap 7
+/// 27. Menampilkan Nama, NIM, dan tombol 'Buka Detail'
+/// 28. Menggunakan Navigator.push() untuk membuka DetailPage
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 7),
+      appBar: AppBar(
+        title: const Text('Tahap 7: Navigator (HomePage)'),
+        backgroundColor: Colors.indigo.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.indigo.shade50.withValues(alpha: 0.4),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ==========================================================
+              // 27. HEADER: MENAMPILKAN NAMA DAN NIM
+              // ==========================================================
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                color: Colors.indigo.shade800,
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.person, color: Colors.indigo, size: 32),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Praktikum Mobile - Tahap 7',
+                              style: TextStyle(
+                                color: Colors.indigoAccent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              studentName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                              ),
+                            ),
+                            Text(
+                              'NIM: $studentId',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const Text(
+                              'Teknologi Rekayasa Perangkat Lunak',
+                              style: TextStyle(
+                                color: Colors.white60,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // KARTU MATERI INTI NAVIGASI
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.layers_rounded, color: Colors.indigo.shade700),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Konsep Stack Navigator di Flutter',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: Colors.indigo.shade900,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 20),
+                      const Text(
+                        'Navigasi di Flutter bekerja seperti struktur data Tumpukan (Stack - LIFO / Last In First Out):',
+                        style: TextStyle(fontSize: 12.5, height: 1.4),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildNavConceptPoint(
+                        title: 'Navigator.push(context, route)',
+                        description:
+                            'Mendorong (menambahkan) halaman baru ke bagian teratas navigation stack di atas HomePage.',
+                        icon: Icons.arrow_upward_rounded,
+                        color: Colors.indigo,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildNavConceptPoint(
+                        title: 'Navigator.pop(context)',
+                        description:
+                            'Mengeluarkan (menghapus) halaman teratas dari stack dan kembali ke halaman sebelumnya.',
+                        icon: Icons.arrow_downward_rounded,
+                        color: Colors.teal,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // 27 & 28. TOMBOL 'BUKA DETAIL' DENGAN NAVIGATOR.PUSH()
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.indigo.shade200),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.touch_app_rounded,
+                        size: 44,
+                        color: Colors.indigo,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Navigasi Menuju DetailPage',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Tekan tombol di bawah untuk membuka halaman detail menggunakan kode Navigator.push():',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12.5, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Cuplikan Kode Sesuai Perintah
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E2E),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Navigator.push(\n'
+                          '  context,\n'
+                          '  MaterialPageRoute(\n'
+                          '    builder: (context) => const DetailPage(),\n'
+                          '  ),\n'
+                          ');',
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            color: Color(0xFF89DDFF),
+                            fontSize: 12.5,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 27 & 28. Tombol 'Buka Detail'
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.indigo.shade800,
+                            foregroundColor: Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          icon: const Icon(Icons.open_in_new_rounded),
+                          label: const Text(
+                            'Buka Detail',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () {
+                            // 28. Navigator.push() menuju DetailPage
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DetailPage(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Visual Status Navigation Stack
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: Colors.indigo, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Status Navigation Stack Saat Ini:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.indigo.shade100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              '[HomePage] ← Teratas di Stack (Root)',
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.indigo,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavConceptPoint({
+    required String title,
+    required String description,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icon, size: 18, color: color),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12.5,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: const TextStyle(fontSize: 12, color: Colors.black87),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================================
+// 26. DETAIL PAGE
+// 29. Menambahkan tombol kembali menggunakan Navigator.pop()
+// 30. Mengamati tombol back bawaan AppBar
+// ============================================================================
+
+class DetailPage extends StatelessWidget {
+  const DetailPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // 30. AppBar dengan tombol back otomatis bawaan Flutter
+      appBar: AppBar(
+        title: const Text('DetailPage (Tahap 7)'),
+        backgroundColor: Colors.teal.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.teal.shade50.withValues(alpha: 0.3),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Identitas Mahasiswa di DetailPage
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                color: Colors.teal.shade800,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.school, color: Colors.teal, size: 28),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Halaman Detail Mahasiswa',
+                              style: TextStyle(
+                                color: Colors.tealAccent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              studentName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              'NIM: $studentId',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // 30. KARTU PENGAMATAN TOMBOL BACK BAWAAN APPBAR
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.amber.shade400, width: 1.5),
+                ),
+                color: Colors.amber.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.arrow_back,
+                            color: Colors.amber.shade900,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '30. Pengamatan: Tombol Back Bawaan AppBar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.5,
+                                color: Colors.amber.shade900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 18),
+                      const Text(
+                        'Perhatikan pojok kiri atas pada AppBar halaman ini (←):',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _buildObservationItem(
+                        'Tombol panah kembali (BackButton) muncul secara otomatis tanpa perlu didefinisikan secara manual pada properti leading di AppBar.',
+                      ),
+                      _buildObservationItem(
+                        'Hal ini terjadi karena Flutter memeriksa Navigator.canPop(context). Karena halaman ini di-push di atas HomePage, canPop bernilai true.',
+                      ),
+                      _buildObservationItem(
+                        'Menekan tombol back di AppBar tersebut akan secara otomatis memanggil Navigator.maybePop() / Navigator.pop(context).',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // 29. TOMBOL KEMBALI MENGGUNAKAN NAVIGATOR.POP()
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.keyboard_return_rounded,
+                        size: 40,
+                        color: Colors.teal,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        '29. Kembali Menggunakan Navigator.pop()',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Anda juga dapat memicu aksi kembali melalui tombol kustom di dalam body menggunakan kode Navigator.pop(context):',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Cuplikan Kode Sesuai Perintah
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E2E),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          '// kembali ke halaman sebelumnya\n'
+                          'Navigator.pop(context);',
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            color: Color(0xFF89DDFF),
+                            fontSize: 12.5,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 29. Tombol Kembali
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal.shade800,
+                            foregroundColor: Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          icon: const Icon(Icons.arrow_back),
+                          label: const Text(
+                            'Kembali (Navigator.pop)',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () {
+                            // 29. Memanggil Navigator.pop()
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Visual Status Navigation Stack saat di DetailPage
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.teal.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.layers, color: Colors.teal, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'Struktur Stack Navigasi Sekarang:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.5,
+                            color: Colors.teal,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.teal.shade100,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        '1. [DetailPage] ← Halaman Teratas (Aktif)',
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: const Text(
+                        '2. [HomePage]   ← Tertumpuk di Bawahnya',
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 11.5,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildObservationItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check, size: 16, color: Colors.amber.shade900),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 12, height: 1.35),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 
 
