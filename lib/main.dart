@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap10Page(),
+      home: Tahap11Page(),
     );
   }
 
@@ -1652,6 +1652,25 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const Tahap10Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.splitscreen_rounded,
+              color: currentTahap == 11 ? Colors.teal : Colors.grey,
+            ),
+            title: const Text('Tahap 11: Adaptive Navigation'),
+            subtitle: const Text('NavigationBar vs NavigationRail (< / >= 840 dp)'),
+            selected: currentTahap == 11,
+            selectedTileColor: Colors.teal.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 11) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap11Page()),
                 );
               }
             },
@@ -7250,4 +7269,734 @@ class Tahap10ProfileDestination extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// TAHAP 11: ADAPTIVE NAVIGATION (NAVIGATIONBAR VS NAVIGATIONRAIL)
+// ============================================================================
+
+/// 43. Shell aplikasi menggunakan LayoutBuilder
+/// 44. Menampilkan NavigationBar pada compact/medium (< 840 dp)
+/// 45. Menampilkan NavigationRail pada expanded (>= 840 dp)
+/// 46. Memastikan page yang aktif tetap sama ketika layout berubah
+class Tahap11Page extends StatefulWidget {
+  const Tahap11Page({super.key});
+
+  @override
+  State<Tahap11Page> createState() => _Tahap11PageState();
+}
+
+class _Tahap11PageState extends State<Tahap11Page> {
+  // 46. selectedIndex disimpan pada State sehingga halaman aktif tetap sama
+  // ketika orientasi atau ukuran layout berubah (< 840 dp vs >= 840 dp)
+  int selectedIndex = 0;
+
+  // Fitur simulasi lebar kontainer (agar mode expanded >= 840 dp dapat diuji langsung di HP)
+  bool _enableSimulatedWidth = false;
+  double _simulatedWidth = 900.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final physicalWidth = mediaQuery.size.width;
+
+    // 43. Menggunakan LayoutBuilder pada shell aplikasi
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Lebar efektif yang dievaluasi (nyata atau simulasi slider)
+        final double effectiveWidth =
+            _enableSimulatedWidth ? _simulatedWidth : constraints.maxWidth;
+        final bool isCompactOrMedium = effectiveWidth < 840;
+
+        // Daftar halaman destinasi (Home, Courses, Profile)
+        final List<Widget> pages = [
+          Tahap11HomeContent(
+            effectiveWidth: effectiveWidth,
+            isCompactOrMedium: isCompactOrMedium,
+            isSimulated: _enableSimulatedWidth,
+            simulatedWidth: _simulatedWidth,
+            physicalWidth: physicalWidth,
+            onToggleSimulation: (val) {
+              setState(() {
+                _enableSimulatedWidth = val;
+                if (val) {
+                  _simulatedWidth = 900.0;
+                }
+              });
+            },
+            onWidthChanged: (val) {
+              setState(() {
+                _simulatedWidth = val;
+              });
+            },
+          ),
+          const Tahap11CoursesContent(),
+          const Tahap11ProfileContent(),
+        ];
+
+        final List<String> tabTitles = const [
+          'Tahap 11: Beranda Adaptif',
+          'Tahap 11: Kursus Adaptif',
+          'Tahap 11: Profil Mahasiswa',
+        ];
+
+        // ================================================================
+        // 44. KONDISI < 840 DP: TAMPILKAN NAVIGATIONBAR (COMPACT/MEDIUM)
+        // ================================================================
+        if (isCompactOrMedium) {
+          return Scaffold(
+            drawer: const AppDrawer(currentTahap: 11),
+            appBar: AppBar(
+              title: Text(tabTitles[selectedIndex]),
+              backgroundColor: Colors.teal.shade800,
+              foregroundColor: Colors.white,
+              actions: [
+                IconButton(
+                  tooltip: 'Simulasi Breakpoint Layout',
+                  icon: Icon(
+                    _enableSimulatedWidth
+                        ? Icons.desktop_windows
+                        : Icons.phone_android,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _enableSimulatedWidth = !_enableSimulatedWidth;
+                      if (_enableSimulatedWidth) {
+                        _simulatedWidth = 900.0;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+            // 46. Page aktif diambil dari pages[selectedIndex]
+            body: pages[selectedIndex],
+            // 44. NavigationBar pada bagian bawah (BottomNavigationBar Material 3)
+            bottomNavigationBar: buildNavigationBar(),
+          );
+        }
+
+        // ================================================================
+        // 45. KONDISI >= 840 DP: TAMPILKAN NAVIGATIONRAIL (EXPANDED)
+        // ================================================================
+        return Scaffold(
+          drawer: const AppDrawer(currentTahap: 11),
+          appBar: AppBar(
+            title: Text('${tabTitles[selectedIndex]} (Mode Expanded / Tablet / Desktop)'),
+            backgroundColor: Colors.teal.shade800,
+            foregroundColor: Colors.white,
+            actions: [
+              IconButton(
+                tooltip: 'Kembali ke Ukuran Layar Nyata',
+                icon: const Icon(Icons.settings_backup_restore),
+                onPressed: () {
+                  setState(() {
+                    _enableSimulatedWidth = false;
+                  });
+                },
+              ),
+            ],
+          ),
+          // 45. Layout horizontal dengan NavigationRail di samping kiri
+          body: Row(
+            children: [
+              buildNavigationRail(),
+              const VerticalDivider(width: 1, thickness: 1),
+              // 46. Page aktif tetap sama diambil dari pages[selectedIndex]
+              Expanded(child: pages[selectedIndex]),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ==========================================================================
+  // 44. WIDGET NAVIGATIONBAR UNTUK COMPACT/MEDIUM (< 840 DP)
+  // ==========================================================================
+  Widget buildNavigationBar() {
+    return NavigationBar(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: (index) {
+        setState(() => selectedIndex = index);
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home, color: Colors.teal),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.school_outlined),
+          selectedIcon: Icon(Icons.school, color: Colors.teal),
+          label: 'Courses',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.person_outline),
+          selectedIcon: Icon(Icons.person, color: Colors.teal),
+          label: 'Profile',
+        ),
+      ],
+    );
+  }
+
+  // ==========================================================================
+  // 45. WIDGET NAVIGATIONRAIL UNTUK EXPANDED (>= 840 DP)
+  // ==========================================================================
+  Widget buildNavigationRail() {
+    return NavigationRail(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: (index) {
+        setState(() => selectedIndex = index);
+      },
+      labelType: NavigationRailLabelType.all,
+      backgroundColor: Colors.white,
+      leading: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.teal.shade800,
+          child: const Icon(Icons.devices, color: Colors.white, size: 20),
+        ),
+      ),
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home, color: Colors.teal),
+          label: Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.school_outlined),
+          selectedIcon: Icon(Icons.school, color: Colors.teal),
+          label: Text('Courses'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.person_outline),
+          selectedIcon: Icon(Icons.person, color: Colors.teal),
+          label: Text('Profile'),
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================================
+// KONTEN DESTINASI 1: HOME TAB TAHAP 11
+// ============================================================================
+
+class Tahap11HomeContent extends StatelessWidget {
+  final double effectiveWidth;
+  final bool isCompactOrMedium;
+  final bool isSimulated;
+  final double simulatedWidth;
+  final double physicalWidth;
+  final ValueChanged<bool> onToggleSimulation;
+  final ValueChanged<double> onWidthChanged;
+
+  const Tahap11HomeContent({
+    super.key,
+    required this.effectiveWidth,
+    required this.isCompactOrMedium,
+    required this.isSimulated,
+    required this.simulatedWidth,
+    required this.physicalWidth,
+    required this.onToggleSimulation,
+    required this.onWidthChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.teal.shade50.withValues(alpha: 0.25),
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          // Identitas Mahasiswa Banner
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            color: Colors.teal.shade800,
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.devices, color: Colors.teal, size: 30),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Praktikum Mobile - Tahap 11',
+                          style: TextStyle(
+                            color: Colors.tealAccent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          studentName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.5,
+                          ),
+                        ),
+                        Text(
+                          'NIM: $studentId  •  TRPL Undiksha',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Kartu Pengamatan Status Breakpoint & Navigasi Aktif
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isCompactOrMedium
+                    ? Colors.orange.shade300
+                    : Colors.indigo.shade300,
+                width: 1.5,
+              ),
+            ),
+            color: isCompactOrMedium ? Colors.orange.shade50 : Colors.indigo.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        isCompactOrMedium
+                            ? Icons.phone_android
+                            : Icons.desktop_windows,
+                        color: isCompactOrMedium
+                            ? Colors.deepOrange.shade800
+                            : Colors.indigo.shade800,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          isCompactOrMedium
+                              ? '44. Mode Compact / Medium (< 840 dp)'
+                              : '45. Mode Expanded (>= 840 dp)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: isCompactOrMedium
+                                ? Colors.deepOrange.shade900
+                                : Colors.indigo.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Komponen Navigasi Aktif:',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isCompactOrMedium
+                              ? Colors.deepOrange
+                              : Colors.indigo,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isCompactOrMedium
+                              ? 'NavigationBar (Bawah)'
+                              : 'NavigationRail (Samping)',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Lebar Layar Saat Ini: ${effectiveWidth.toStringAsFixed(1)} dp '
+                    '${isSimulated ? "(Mode Simulasi Slider)" : "(Ukuran Layar Fisik)"}',
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '46. Pembuktian: Tab yang dipilih tetap sama saat ukuran layar berubah antara ponsel dan tablet/desktop tanpa reload atau reset posisi.',
+                    style: TextStyle(fontSize: 12, height: 1.35),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Kontrol Simulasi Slider Breakpoint
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.teal.shade200),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.tune, color: Colors.teal, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Simulasi Breakpoint Layar:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Switch(
+                        value: isSimulated,
+                        activeColor: Colors.teal,
+                        onChanged: onToggleSimulation,
+                      ),
+                    ],
+                  ),
+                  Text(
+                    isSimulated
+                        ? 'Geser slider untuk berpindah seketika antara < 840 dp (NavigationBar) dan >= 840 dp (NavigationRail):'
+                        : 'Aktifkan switch untuk menguji tampilan NavigationRail langsung di layar ponsel.',
+                    style: const TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                  if (isSimulated) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text(
+                          '${simulatedWidth.toStringAsFixed(0)} dp',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            value: simulatedWidth,
+                            min: 360.0,
+                            max: 1200.0,
+                            divisions: 28,
+                            activeColor: Colors.teal,
+                            onChanged: onWidthChanged,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Cuplikan Kode Materi Sesuai Perintah
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Cuplikan Kode Shell Adaptif (Materi 11):',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E1E2E),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'if (constraints.maxWidth < 840) {\n'
+                      '  return Scaffold(\n'
+                      '    body: pages[selectedIndex],\n'
+                      '    bottomNavigationBar: buildNavigationBar(),\n'
+                      '  );\n'
+                      '}\n\n'
+                      'return Scaffold(\n'
+                      '  body: Row(\n'
+                      '    children: [\n'
+                      '      buildNavigationRail(),\n'
+                      '      const VerticalDivider(width: 1),\n'
+                      '      Expanded(child: pages[selectedIndex]),\n'
+                      '    ],\n'
+                      '  ),\n'
+                      ');',
+                      style: TextStyle(
+                        fontFamily: 'monospace',
+                        color: Color(0xFF89DDFF),
+                        fontSize: 11.5,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// KONTEN DESTINASI 2: COURSES TAB TAHAP 11
+// ============================================================================
+
+class Tahap11CoursesContent extends StatelessWidget {
+  const Tahap11CoursesContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey.shade50,
+      child: FutureBuilder<Map<String, dynamic>>(
+        future: loadStudentData(),
+        builder: (context, snapshot) {
+          List<dynamic> courses = fallbackCourses;
+          if (snapshot.hasData && snapshot.data != null) {
+            final data = snapshot.data!;
+            if (data['courses'] is List) {
+              courses = data['courses'] as List<dynamic>;
+            }
+          }
+
+          return ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Daftar Kursus Adaptif',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    '${courses.length} Kursus Tersedia',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.teal.shade800,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              ...courses.map((item) {
+                final Map<String, dynamic> course =
+                    Map<String, dynamic>.from(item as Map);
+                final String code = course['code']?.toString() ?? 'MOB';
+                final String title = course['title']?.toString() ?? 'Course';
+                final int credits = (course['credits'] as num?)?.toInt() ?? 2;
+                final String status =
+                    course['status']?.toString().toLowerCase() ?? 'planned';
+
+                Color statusColor = status == 'done'
+                    ? Colors.green
+                    : (status == 'active' ? Colors.blue : Colors.orange);
+
+                return Card(
+                  elevation: 1,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: ListTile(
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        code,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: statusColor,
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    subtitle: Text('$credits SKS  •  Status: $status'),
+                    trailing: const Icon(Icons.check_circle_outline, size: 18),
+                  ),
+                );
+              }),
+              const SizedBox(height: 20),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// KONTEN DESTINASI 3: PROFILE TAB TAHAP 11
+// ============================================================================
+
+class Tahap11ProfileContent extends StatelessWidget {
+  const Tahap11ProfileContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey.shade50,
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 36,
+                    backgroundColor: Colors.teal.shade800,
+                    child: const Icon(
+                      Icons.person,
+                      size: 42,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    studentName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.teal.shade50,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.teal.shade200),
+                    ),
+                    child: Text(
+                      'NIM: $studentId',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Colors.teal.shade800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Teknologi Rekayasa Perangkat Lunak',
+                    style: TextStyle(fontSize: 13, color: Colors.black54),
+                  ),
+                  const Text(
+                    'Universitas Pendidikan Ganesha (Undiksha)',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.email_outlined, color: Colors.teal),
+                  title: Text('Email Undiksha', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  subtitle: Text('michael.marcel@undiksha.ac.id', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Divider(height: 1),
+                ListTile(
+                  leading: Icon(Icons.devices, color: Colors.teal),
+                  title: Text('Pengujian Navigasi Adaptif', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  subtitle: Text('Material 3 NavigationBar vs NavigationRail', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
 
