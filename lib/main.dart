@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: Tahap8Page(),
     );
   }
 
@@ -1290,7 +1290,8 @@ class ExpandedLayout extends StatelessWidget {
                       const SizedBox(height: 12),
                       _buildSampleCard(
                         title: 'Multi-window Adaptivity',
-                        subtitle: 'Dapat diuji dengan resize window desktop/browser',
+                        subtitle:
+                            'Dapat diuji dengan resize window desktop/browser',
                         icon: Icons.open_in_full,
                         color: Colors.indigo,
                       ),
@@ -1449,7 +1450,10 @@ class AppDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white24,
                     borderRadius: BorderRadius.circular(4),
@@ -1591,6 +1595,25 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const HomePage()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.send_and_archive_rounded,
+              color: currentTahap == 8 ? Colors.teal : Colors.grey,
+            ),
+            title: const Text('Tahap 8: Passing Data ke Detail'),
+            subtitle: const Text('Constructor Passing & CourseDetailPage'),
+            selected: currentTahap == 8,
+            selectedTileColor: Colors.teal.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 8) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap8Page()),
                 );
               }
             },
@@ -1866,7 +1889,11 @@ class _Tahap4PageState extends State<Tahap4Page> {
                               children: [
                                 const Row(
                                   children: [
-                                    Icon(Icons.tune, size: 18, color: Colors.teal),
+                                    Icon(
+                                      Icons.tune,
+                                      size: 18,
+                                      color: Colors.teal,
+                                    ),
                                     SizedBox(width: 6),
                                     Text(
                                       '15. Amati Pembagian Ruang:',
@@ -1886,7 +1913,10 @@ class _Tahap4PageState extends State<Tahap4Page> {
                                       _enableSimulatedResize = val;
                                       if (val) {
                                         _simulatedContainerWidth =
-                                            (screenWidth * 0.85).clamp(280.0, 700.0);
+                                            (screenWidth * 0.85).clamp(
+                                              280.0,
+                                              700.0,
+                                            );
                                       }
                                     });
                                   },
@@ -1897,7 +1927,10 @@ class _Tahap4PageState extends State<Tahap4Page> {
                               _enableSimulatedResize
                                   ? 'Mode Simulasi Ukuran Aktif: Geser slider di bawah atau ubah ukuran jendela desktop/browser untuk mengamati pembagian ruang proporsional.'
                                   : 'Menggunakan lebar layar penuh (${screenWidth.toStringAsFixed(1)} dp). Aktifkan switch untuk menguji simulasi slider ukuran layar.',
-                              style: const TextStyle(fontSize: 12, color: Colors.black87),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black87,
+                              ),
                             ),
                             if (_enableSimulatedResize) ...[
                               const SizedBox(height: 10),
@@ -1914,9 +1947,12 @@ class _Tahap4PageState extends State<Tahap4Page> {
                                     child: Slider(
                                       value: _simulatedContainerWidth,
                                       min: 260.0,
-                                      max: screenWidth > 320 ? screenWidth : 320.0,
+                                      max: screenWidth > 320
+                                          ? screenWidth
+                                          : 320.0,
                                       divisions: 30,
-                                      label: '${_simulatedContainerWidth.toStringAsFixed(0)} dp',
+                                      label:
+                                          '${_simulatedContainerWidth.toStringAsFixed(0)} dp',
                                       activeColor: Colors.teal,
                                       onChanged: (val) {
                                         setState(() {
@@ -2005,7 +2041,11 @@ class _Tahap4PageState extends State<Tahap4Page> {
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.info_outline, size: 18, color: Colors.indigo),
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 18,
+                                  color: Colors.indigo,
+                                ),
                                 SizedBox(width: 6),
                                 Text(
                                   'Hasil Observasi Pembagian Ruang (Butir 15):',
@@ -2054,7 +2094,10 @@ class _Tahap4PageState extends State<Tahap4Page> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.compare_arrows, color: Colors.deepPurple.shade700),
+                          Icon(
+                            Icons.compare_arrows,
+                            color: Colors.deepPurple.shade700,
+                          ),
                           const SizedBox(width: 8),
                           const Text(
                             'Eksplorasi Materi: Expanded vs Flexible',
@@ -2078,7 +2121,8 @@ class _Tahap4PageState extends State<Tahap4Page> {
                             selected: _useExpandedOverFlexible,
                             selectedColor: Colors.deepPurple.shade100,
                             onSelected: (val) {
-                              if (val) setState(() => _useExpandedOverFlexible = true);
+                              if (val)
+                                setState(() => _useExpandedOverFlexible = true);
                             },
                           ),
                           const SizedBox(width: 8),
@@ -2087,7 +2131,10 @@ class _Tahap4PageState extends State<Tahap4Page> {
                             selected: !_useExpandedOverFlexible,
                             selectedColor: Colors.indigo.shade100,
                             onSelected: (val) {
-                              if (val) setState(() => _useExpandedOverFlexible = false);
+                              if (val)
+                                setState(
+                                  () => _useExpandedOverFlexible = false,
+                                );
                             },
                           ),
                         ],
@@ -2246,7 +2293,11 @@ class _Tahap4PageState extends State<Tahap4Page> {
                           children: [
                             const Row(
                               children: [
-                                Icon(Icons.check_circle, size: 16, color: Colors.teal),
+                                Icon(
+                                  Icons.check_circle,
+                                  size: 16,
+                                  color: Colors.teal,
+                                ),
                                 SizedBox(width: 6),
                                 Text(
                                   'Tampilan Hasil Widget Wrap:',
@@ -2420,20 +2471,26 @@ class _Tahap4PageState extends State<Tahap4Page> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.red.shade300),
+                                  border: Border.all(
+                                    color: Colors.red.shade300,
+                                  ),
                                 ),
                                 child: Stack(
                                   children: [
                                     SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
-                                      physics: const NeverScrollableScrollPhysics(),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       child: Row(
                                         children: skills
-                                            .map((e) => Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(right: 8),
-                                                  child: Chip(label: Text(e)),
-                                                ))
+                                            .map(
+                                              (e) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                  right: 8,
+                                                ),
+                                                child: Chip(label: Text(e)),
+                                              ),
+                                            )
                                             .toList(),
                                       ),
                                     ),
@@ -2455,7 +2512,13 @@ class _Tahap4PageState extends State<Tahap4Page> {
                                               Colors.black,
                                               Colors.yellow.shade700,
                                             ],
-                                            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                                            stops: const [
+                                              0.0,
+                                              0.25,
+                                              0.5,
+                                              0.75,
+                                              1.0,
+                                            ],
                                             tileMode: TileMode.repeated,
                                           ),
                                           boxShadow: const [
@@ -2479,7 +2542,9 @@ class _Tahap4PageState extends State<Tahap4Page> {
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade50,
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.red.shade200),
+                                  border: Border.all(
+                                    color: Colors.red.shade200,
+                                  ),
                                 ),
                                 child: const Row(
                                   children: [
@@ -2529,8 +2594,12 @@ class _Tahap4PageState extends State<Tahap4Page> {
   Widget buildBox(String label, {Color? color, String? subtitle, int? flex}) {
     final bool isA = label == 'A';
     final Color primaryColor = isA ? Colors.deepPurple : Colors.amber.shade800;
-    final Color bgColor = isA ? Colors.deepPurple.shade50 : Colors.amber.shade50;
-    final Color borderColor = isA ? Colors.deepPurple.shade300 : Colors.amber.shade300;
+    final Color bgColor = isA
+        ? Colors.deepPurple.shade50
+        : Colors.amber.shade50;
+    final Color borderColor = isA
+        ? Colors.deepPurple.shade300
+        : Colors.amber.shade300;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -2687,7 +2756,9 @@ class _Tahap4PageState extends State<Tahap4Page> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isPositive ? Colors.teal.shade50.withValues(alpha: 0.4) : Colors.red.shade50.withValues(alpha: 0.4),
+        color: isPositive
+            ? Colors.teal.shade50.withValues(alpha: 0.4)
+            : Colors.red.shade50.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: themeColor.withValues(alpha: 0.4)),
       ),
@@ -2728,7 +2799,10 @@ class _Tahap4PageState extends State<Tahap4Page> {
 
   Widget _buildComparisonTable() {
     return Table(
-      border: TableBorder.all(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(8)),
+      border: TableBorder.all(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(8),
+      ),
       columnWidths: const {
         0: FlexColumnWidth(2.2),
         1: FlexColumnWidth(3),
@@ -2749,14 +2823,22 @@ class _Tahap4PageState extends State<Tahap4Page> {
               padding: EdgeInsets.all(8.0),
               child: Text(
                 'Row Biasa',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.red),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: Colors.red,
+                ),
               ),
             ),
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
                 'Wrap Widget',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.teal),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: Colors.teal,
+                ),
               ),
             ),
           ],
@@ -2806,7 +2888,11 @@ class _Tahap4PageState extends State<Tahap4Page> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             wrapVal,
-            style: const TextStyle(fontSize: 11.5, color: Colors.teal, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 11.5,
+              color: Colors.teal,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
@@ -2837,12 +2923,7 @@ double childAspectRatioFor(int columns) {
 
 /// Fallback data jika JSON belum selesai dimuat atau terjadi kendala I/O
 final List<Map<String, dynamic>> fallbackCourses = const [
-  {
-    'code': 'MOB01',
-    'title': 'Git & GitHub',
-    'credits': 2,
-    'status': 'done',
-  },
+  {'code': 'MOB01', 'title': 'Git & GitHub', 'credits': 2, 'status': 'done'},
   {
     'code': 'MOB02',
     'title': 'Dart Fundamentals',
@@ -2855,12 +2936,7 @@ final List<Map<String, dynamic>> fallbackCourses = const [
     'credits': 3,
     'status': 'active',
   },
-  {
-    'code': 'MOB04',
-    'title': 'Navigation',
-    'credits': 2,
-    'status': 'planned',
-  },
+  {'code': 'MOB04', 'title': 'Navigation', 'credits': 2, 'status': 'planned'},
   {
     'code': 'MOB05',
     'title': 'State Management',
@@ -2930,7 +3006,8 @@ class _Tahap5PageState extends State<Tahap5Page> {
 
             final int totalCredits = courses.fold<int>(
               0,
-              (sum, item) => sum + (((item as Map)['credits'] as num?)?.toInt() ?? 0),
+              (sum, item) =>
+                  sum + (((item as Map)['credits'] as num?)?.toInt() ?? 0),
             );
 
             return Column(
@@ -3046,10 +3123,11 @@ class _Tahap5PageState extends State<Tahap5Page> {
                             ),
                             onPressed: () {
                               setState(() {
-                                _enableSimulatedResize = !_enableSimulatedResize;
+                                _enableSimulatedResize =
+                                    !_enableSimulatedResize;
                                 if (_enableSimulatedResize) {
-                                  _simulatedContainerWidth =
-                                      physicalWidth.clamp(320.0, 900.0);
+                                  _simulatedContainerWidth = physicalWidth
+                                      .clamp(320.0, 900.0);
                                 }
                               });
                             },
@@ -3089,8 +3167,8 @@ class _Tahap5PageState extends State<Tahap5Page> {
                                     _simulatedContainerWidth < 600
                                         ? 'Mode: Compact (1 Kolom)'
                                         : (_simulatedContainerWidth < 840
-                                            ? 'Mode: Medium (2 Kolom)'
-                                            : 'Mode: Expanded (3 Kolom)'),
+                                              ? 'Mode: Medium (2 Kolom)'
+                                              : 'Mode: Expanded (3 Kolom)'),
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
@@ -3146,7 +3224,9 @@ class _Tahap5PageState extends State<Tahap5Page> {
                           // 20. Penentuan jumlah kolom menggunakan columnsFor(constraints.maxWidth)
                           final double effectiveWidth = constraints.maxWidth;
                           final int columns = columnsFor(effectiveWidth);
-                          final double aspectRatio = childAspectRatioFor(columns);
+                          final double aspectRatio = childAspectRatioFor(
+                            columns,
+                          );
 
                           String layoutCategory;
                           Color badgeColor;
@@ -3212,11 +3292,13 @@ class _Tahap5PageState extends State<Tahap5Page> {
                                   padding: const EdgeInsets.all(12),
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: columnsFor(effectiveWidth),
-                                    crossAxisSpacing: 12,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: aspectRatio,
-                                  ),
+                                        crossAxisCount: columnsFor(
+                                          effectiveWidth,
+                                        ),
+                                        crossAxisSpacing: 12,
+                                        mainAxisSpacing: 12,
+                                        childAspectRatio: aspectRatio,
+                                      ),
                                   itemCount: courses.length,
                                   itemBuilder: (context, index) {
                                     final courseMap =
@@ -3344,7 +3426,10 @@ class CourseCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
@@ -3359,7 +3444,10 @@ class CourseCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2.5,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
@@ -3404,7 +3492,11 @@ class CourseCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.credit_card, size: 13, color: Colors.grey.shade600),
+                    Icon(
+                      Icons.credit_card,
+                      size: 13,
+                      color: Colors.grey.shade600,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '$credits SKS',
@@ -3469,13 +3561,16 @@ class _Tahap6PageState extends State<Tahap6Page> {
     super.initState();
     _nameController = TextEditingController(text: studentName);
     _nimController = TextEditingController(text: studentId);
-    _prodiController =
-        TextEditingController(text: 'Teknologi Rekayasa Perangkat Lunak');
-    _emailController =
-        TextEditingController(text: 'michael.marcel@undiksha.ac.id');
+    _prodiController = TextEditingController(
+      text: 'Teknologi Rekayasa Perangkat Lunak',
+    );
+    _emailController = TextEditingController(
+      text: 'michael.marcel@undiksha.ac.id',
+    );
     _phoneController = TextEditingController(text: '081234567890');
-    _addressController =
-        TextEditingController(text: 'Singaraja, Buleleng, Bali');
+    _addressController = TextEditingController(
+      text: 'Singaraja, Buleleng, Bali',
+    );
     _bioController = TextEditingController(
       text:
           'Tertarik pada Mobile Application Development, Flutter UI Engineering, dan Reactive State Management.',
@@ -3516,9 +3611,7 @@ class _Tahap6PageState extends State<Tahap6Page> {
         actions: [
           IconButton(
             tooltip: isKeyboardOpen ? 'Tutup Keyboard' : 'Fokus Field Bawah',
-            icon: Icon(
-              isKeyboardOpen ? Icons.keyboard_hide : Icons.keyboard,
-            ),
+            icon: Icon(isKeyboardOpen ? Icons.keyboard_hide : Icons.keyboard),
             onPressed: () {
               if (isKeyboardOpen) {
                 FocusScope.of(context).unfocus();
@@ -3827,7 +3920,9 @@ class _Tahap6PageState extends State<Tahap6Page> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
             side: BorderSide(
-              color: isScrollEnabled ? Colors.green.shade200 : Colors.red.shade200,
+              color: isScrollEnabled
+                  ? Colors.green.shade200
+                  : Colors.red.shade200,
             ),
           ),
           color: isScrollEnabled ? Colors.green.shade50 : Colors.red.shade50,
@@ -3837,8 +3932,12 @@ class _Tahap6PageState extends State<Tahap6Page> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  isScrollEnabled ? Icons.check_circle : Icons.warning_amber_rounded,
-                  color: isScrollEnabled ? Colors.green.shade800 : Colors.red.shade800,
+                  isScrollEnabled
+                      ? Icons.check_circle
+                      : Icons.warning_amber_rounded,
+                  color: isScrollEnabled
+                      ? Colors.green.shade800
+                      : Colors.red.shade800,
                   size: 20,
                 ),
                 const SizedBox(width: 10),
@@ -4202,8 +4301,10 @@ class _Tahap6PageState extends State<Tahap6Page> {
         helperText: helperText,
         helperMaxLines: 2,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
       ),
     );
   }
@@ -4335,7 +4436,11 @@ class HomePage extends StatelessWidget {
                       const CircleAvatar(
                         radius: 28,
                         backgroundColor: Colors.white,
-                        child: Icon(Icons.person, color: Colors.indigo, size: 32),
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.indigo,
+                          size: 32,
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -4396,7 +4501,10 @@ class HomePage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.layers_rounded, color: Colors.indigo.shade700),
+                          Icon(
+                            Icons.layers_rounded,
+                            color: Colors.indigo.shade700,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'Konsep Stack Navigator di Flutter',
@@ -4542,7 +4650,11 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: Colors.indigo, size: 20),
+                    const Icon(
+                      Icons.info_outline,
+                      color: Colors.indigo,
+                      size: 20,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
@@ -4947,7 +5059,717 @@ class DetailPage extends StatelessWidget {
   }
 }
 
+// ============================================================================
+// TAHAP 8: PASSING DATA DARI LIST KE DETAIL PAGE
+// ============================================================================
 
+/// Halaman demonstrasi praktikum Tahap 8:
+/// - 31. Gunakan list course dari pertemuan sebelumnya.
+/// - 32. Setiap ListTile/Card dapat ditekan.
+/// - 33. Kirim Map course ke CourseDetailPage via constructor.
+/// - 34. Tampilkan title, code, credits/status, serta Nama dan NIM mahasiswa pada detail.
+class Tahap8Page extends StatelessWidget {
+  const Tahap8Page({super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 8),
+      appBar: AppBar(
+        title: const Text('Tahap 8: Passing Data ke Detail'),
+        backgroundColor: Colors.teal.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.teal.shade50.withValues(alpha: 0.25),
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: loadStudentData(),
+          builder: (context, snapshot) {
+            // 31. Mengambil list course dari JSON pertemuan sebelumnya (fallback jika loading)
+            List<dynamic> courses = fallbackCourses;
+            if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data!;
+              if (data['courses'] is List) {
+                courses = data['courses'] as List<dynamic>;
+              }
+            }
 
+            return ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                // ========================================================
+                // HEADER IDENTITAS MAHASISWA & PENJELASAN TAHAP 8
+                // ========================================================
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  color: Colors.teal.shade800,
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 28,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.school,
+                            color: Colors.teal,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Praktikum Mobile - Tahap 8',
+                                style: TextStyle(
+                                  color: Colors.tealAccent,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                studentName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.5,
+                                ),
+                              ),
+                              Text(
+                                'NIM: $studentId  •  TRPL Undiksha',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
 
+                // Kartu Penjelasan Singkat Konsep Constructor Passing
+                Card(
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.teal.shade200),
+                  ),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: Colors.teal.shade800,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Materi: Passing Data via Constructor',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: Colors.teal.shade900,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Screen detail menerima data melalui constructor, sehingga satu widget CourseDetailPage dapat digunakan ulang untuk menampilkan detail mata kuliah apapun secara dinamis.',
+                          style: TextStyle(fontSize: 12, height: 1.4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Header List Materi
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.list_alt_rounded,
+                          color: Colors.teal.shade800,
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '31. Daftar Kursus (Ketuk untuk Detail)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '${courses.length} Kursus',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // ========================================================
+                // 31, 32, & 33. LIST COURSE (CARD/LISTTILE DAPAT DITEKAN)
+                // ========================================================
+                ...courses.map((item) {
+                  final Map<String, dynamic> course = Map<String, dynamic>.from(
+                    item as Map,
+                  );
+                  final String code = course['code']?.toString() ?? 'MOB';
+                  final String title = course['title']?.toString() ?? 'Course';
+                  final int credits = (course['credits'] as num?)?.toInt() ?? 2;
+                  final String status =
+                      course['status']?.toString().toLowerCase() ?? 'planned';
+
+                  Color statusColor;
+                  IconData statusIcon;
+                  String statusLabel;
+                  switch (status) {
+                    case 'done':
+                      statusColor = Colors.green;
+                      statusIcon = Icons.check_circle_rounded;
+                      statusLabel = 'Selesai';
+                      break;
+                    case 'active':
+                      statusColor = Colors.blue;
+                      statusIcon = Icons.play_circle_fill_rounded;
+                      statusLabel = 'Aktif';
+                      break;
+                    default:
+                      statusColor = Colors.orange;
+                      statusIcon = Icons.schedule_rounded;
+                      statusLabel = 'Rencana';
+                  }
+
+                  // 32. Card/ListTile dapat ditekan (onTap)
+                  return Card(
+                    elevation: 1.5,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      // 32 & 33. Mengirim Map course ke CourseDetailPage
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CourseDetailPage(course: course),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Row(
+                          children: [
+                            // Avatar Kode Kursus
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: statusColor.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                code,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+
+                            // Informasi Kursus
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: Color(0xFF1E293B),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade100,
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey.shade300,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '$credits SKS',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 7,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: statusColor.withValues(
+                                            alpha: 0.12,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              statusIcon,
+                                              size: 11,
+                                              color: statusColor,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              statusLabel,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: statusColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Ikon Navigasi Panah
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 15,
+                              color: Colors.grey.shade400,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// MATERI TAHAP 8: COURSE DETAIL PAGE
+// - Menerima data melalui constructor: final Map<String, dynamic> course;
+// - 34. Menampilkan title, code, credits/status, serta Nama dan NIM mahasiswa.
+// ============================================================================
+
+class CourseDetailPage extends StatelessWidget {
+  final Map<String, dynamic> course;
+
+  const CourseDetailPage({super.key, required this.course});
+
+  @override
+  Widget build(BuildContext context) {
+    final String code = course['code']?.toString() ?? 'MOB';
+    final String title = course['title']?.toString() ?? 'Judul Kursus';
+    final int credits = (course['credits'] as num?)?.toInt() ?? 2;
+    final String status =
+        course['status']?.toString().toLowerCase() ?? 'planned';
+
+    Color statusColor;
+    IconData statusIcon;
+    String statusLabel;
+    String statusDescription;
+
+    switch (status) {
+      case 'done':
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle_rounded;
+        statusLabel = 'Telah Selesai (Done)';
+        statusDescription =
+            'Mata kuliah / topik ini telah dipelajari dan diselesaikan pada pertemuan sebelumnya.';
+        break;
+      case 'active':
+        statusColor = Colors.blue;
+        statusIcon = Icons.play_circle_fill_rounded;
+        statusLabel = 'Sedang Berlangsung (Active)';
+        statusDescription =
+            'Topik ini sedang dipelajari pada modul praktikum saat ini.';
+        break;
+      default:
+        statusColor = Colors.orange;
+        statusIcon = Icons.schedule_rounded;
+        statusLabel = 'Direncanakan (Planned)';
+        statusDescription =
+            'Materi ini dijadwalkan untuk dipelajari pada pertemuan praktikum berikutnya.';
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail: $code'),
+        backgroundColor: Colors.teal.shade800,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        color: Colors.grey.shade50,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ==========================================================
+              // 34. IDENTITAS MAHASISWA PADA DETAIL PAGE
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                color: Colors.teal.shade800,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 26,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.person, color: Colors.teal, size: 28),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Mahasiswa TRPL Undiksha',
+                              style: TextStyle(
+                                color: Colors.tealAccent,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              studentName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              'NIM: $studentId',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ==========================================================
+              // 34. DETAIL COURSE: CODE, TITLE, CREDITS, & STATUS
+              // ==========================================================
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(color: statusColor.withValues(alpha: 0.3)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Kode Kursus & Badge Status
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusColor.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              code,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: statusColor,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 9,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(statusIcon, size: 13, color: statusColor),
+                                const SizedBox(width: 4),
+                                Text(
+                                  statusLabel,
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: statusColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Judul Kursus (Title)
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E293B),
+                          height: 1.25,
+                        ),
+                      ),
+                      const Divider(height: 24),
+
+                      // Rincian Informasi
+                      _buildDetailRow(
+                        icon: Icons.credit_card,
+                        label: 'Bobot Satuan Kredit Semester:',
+                        value: '$credits SKS',
+                        color: Colors.indigo,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildDetailRow(
+                        icon: Icons.flag,
+                        label: 'Status Pengerjaan Materi:',
+                        value: statusLabel,
+                        color: statusColor,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildDetailRow(
+                        icon: Icons.code,
+                        label: 'Format Data Diterima:',
+                        value: 'Map<String, dynamic>',
+                        color: Colors.teal,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Penjelasan Status
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: statusColor.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.info, size: 16, color: statusColor),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                statusDescription,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black87,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Kartu Edukasi Passing Data
+              Card(
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.terminal, color: Colors.teal),
+                          SizedBox(width: 8),
+                          Text(
+                            'Cuplikan Kode Constructor Passing (Materi 8)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E2E),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          '// Navigasi dengan data course\n'
+                          'Navigator.push(\n'
+                          '  context,\n'
+                          '  MaterialPageRoute(\n'
+                          '    builder: (_) => CourseDetailPage(course: course),\n'
+                          '  ),\n'
+                          ');',
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            color: Color(0xFF89DDFF),
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Tombol Kembali
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.teal.shade700),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: Icon(Icons.arrow_back, color: Colors.teal.shade800),
+                  label: Text(
+                    'Kembali ke Daftar Kursus',
+                    style: TextStyle(
+                      color: Colors.teal.shade900,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 12.5, color: Colors.black87),
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12.5,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+}
