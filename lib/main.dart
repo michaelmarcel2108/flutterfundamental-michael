@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap9Page(),
+      home: Tahap10Page(),
     );
   }
 
@@ -1633,6 +1633,25 @@ class AppDrawer extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const Tahap9Page()),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.tab_rounded,
+              color: currentTahap == 10 ? Colors.indigo : Colors.grey,
+            ),
+            title: const Text('Tahap 10: NavigationBar (Bottom Nav)'),
+            subtitle: const Text('Home, Courses, & Profile Destinations'),
+            selected: currentTahap == 10,
+            selectedTileColor: Colors.indigo.withValues(alpha: 0.1),
+            onTap: () {
+              Navigator.pop(context);
+              if (currentTahap != 10) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Tahap10Page()),
                 );
               }
             },
@@ -6669,6 +6688,563 @@ class _CustomFeedbackPageState extends State<CustomFeedbackPage> {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// TAHAP 10: NAVIGATIONBAR / BOTTOMNAVIGATIONBAR
+// ============================================================================
+
+/// 40. StatefulWidget untuk menyimpan selectedIndex
+/// 39. Tiga destination: Home, Courses, Profile
+/// 41. Menampilkan widget/page sesuai index
+/// 42. Identitas mahasiswa tersedia pada Profile dan screen lainnya
+class Tahap10Page extends StatefulWidget {
+  const Tahap10Page({super.key});
+
+  @override
+  State<Tahap10Page> createState() => _Tahap10PageState();
+}
+
+class _Tahap10PageState extends State<Tahap10Page> {
+  // 40. Menyimpan index destinasi aktif
+  int currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    // Judul AppBar dinamis berdasarkan tab yang dipilih
+    final List<String> tabTitles = const [
+      'Tahap 10: Home Dashboard',
+      'Tahap 10: Daftar Courses',
+      'Tahap 10: Profil Mahasiswa',
+    ];
+
+    return Scaffold(
+      drawer: const AppDrawer(currentTahap: 10),
+      appBar: AppBar(
+        title: Text(tabTitles[currentIndex]),
+        backgroundColor: Colors.indigo.shade800,
+        foregroundColor: Colors.white,
+      ),
+      // 41. Menampilkan widget/halaman yang sesuai dengan currentIndex
+      // Menggunakan IndexedStack agar state dan posisi scroll tiap halaman tetap terjaga
+      body: IndexedStack(
+        index: currentIndex,
+        children: const [
+          Tahap10HomeDestination(),
+          Tahap10CoursesDestination(),
+          Tahap10ProfileDestination(),
+        ],
+      ),
+      // 39 & Materi. NavigationBar Material 3 dengan 3 Destinasi
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: currentIndex,
+        onDestinationSelected: (index) {
+          setState(() => currentIndex = index);
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home, color: Colors.indigo),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.school_outlined),
+            selectedIcon: Icon(Icons.school, color: Colors.indigo),
+            label: 'Courses',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person, color: Colors.indigo),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// DESTINASI 1: HOME DESTINATION
+// 42. Memuat identitas mahasiswa (Nama & NIM)
+// ============================================================================
+
+class Tahap10HomeDestination extends StatelessWidget {
+  const Tahap10HomeDestination({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.indigo.shade50.withValues(alpha: 0.3),
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          // 42. Identitas Mahasiswa pada Screen Home
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            color: Colors.indigo.shade800,
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, color: Colors.indigo, size: 30),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Selamat Datang di Beranda,',
+                          style: TextStyle(
+                            color: Colors.indigoAccent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          studentName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.5,
+                          ),
+                        ),
+                        Text(
+                          'NIM: $studentId  •  TRPL Undiksha',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Kartu Materi Inti Tahap 10
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.indigo.shade200),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.tab_rounded, color: Colors.indigo.shade800),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Materi: Navigasi Utama Tingkat Atas',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.5,
+                          color: Colors.indigo.shade900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 20),
+                  const Text(
+                    'NavigationBar digunakan untuk berpindah antar-destinasi tingkat atas seperti Home, Courses, dan Profile.',
+                    style: TextStyle(fontSize: 12.5, height: 1.4),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.amber.shade300),
+                    ),
+                    child: const Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.warning_amber_rounded,
+                            size: 18, color: Colors.amber),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Penting: Jangan gunakan Navigator.push() berulang untuk setiap tab utama, karena akan menumpuk rute tanpa akhir dan memboroskan memori. Gunakan NavigationBar dengan selectedIndex.',
+                            style: TextStyle(fontSize: 12, height: 1.35),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Ringkasan Statistik Singkat
+          const Text(
+            'Ringkasan Perkuliahan Mobile:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryCard(
+                  title: 'Modul Selesai',
+                  value: '2 Modul',
+                  icon: Icons.check_circle,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildSummaryCard(
+                  title: 'Modul Aktif',
+                  value: '1 Modul',
+                  icon: Icons.play_circle_fill,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildSummaryCard(
+                  title: 'Rencana',
+                  value: '3 Modul',
+                  icon: Icons.schedule,
+                  color: Colors.orange,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 11, color: Colors.black54),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// DESTINASI 2: COURSES DESTINATION
+// ============================================================================
+
+class Tahap10CoursesDestination extends StatelessWidget {
+  const Tahap10CoursesDestination({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey.shade50,
+      child: FutureBuilder<Map<String, dynamic>>(
+        future: loadStudentData(),
+        builder: (context, snapshot) {
+          List<dynamic> courses = fallbackCourses;
+          if (snapshot.hasData && snapshot.data != null) {
+            final data = snapshot.data!;
+            if (data['courses'] is List) {
+              courses = data['courses'] as List<dynamic>;
+            }
+          }
+
+          return ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              // Header Daftar Kursus
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Daftar Materi Praktikum Mobile',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  Text(
+                    '${courses.length} Kursus',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.indigo,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Item Kursus
+              ...courses.map((item) {
+                final Map<String, dynamic> course =
+                    Map<String, dynamic>.from(item as Map);
+                final String code = course['code']?.toString() ?? 'MOB';
+                final String title = course['title']?.toString() ?? 'Course';
+                final int credits = (course['credits'] as num?)?.toInt() ?? 2;
+                final String status =
+                    course['status']?.toString().toLowerCase() ?? 'planned';
+
+                Color statusColor;
+                IconData statusIcon;
+                String statusLabel;
+                switch (status) {
+                  case 'done':
+                    statusColor = Colors.green;
+                    statusIcon = Icons.check_circle_rounded;
+                    statusLabel = 'Selesai';
+                    break;
+                  case 'active':
+                    statusColor = Colors.blue;
+                    statusIcon = Icons.play_circle_fill_rounded;
+                    statusLabel = 'Aktif';
+                    break;
+                  default:
+                    statusColor = Colors.orange;
+                    statusIcon = Icons.schedule_rounded;
+                    statusLabel = 'Rencana';
+                }
+
+                return Card(
+                  elevation: 1,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: ListTile(
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        code,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11.5,
+                          color: statusColor,
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    subtitle: Text('$credits SKS  •  $statusLabel'),
+                    trailing: Icon(
+                      statusIcon,
+                      color: statusColor,
+                      size: 20,
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: 20),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// DESTINASI 3: PROFILE DESTINATION
+// 42. Memuat identitas lengkap mahasiswa (Nama & NIM)
+// ============================================================================
+
+class Tahap10ProfileDestination extends StatelessWidget {
+  const Tahap10ProfileDestination({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey.shade50,
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          // 42. Kartu Profil Utama Mahasiswa
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 36,
+                    backgroundColor: Colors.indigo.shade800,
+                    child: const Icon(
+                      Icons.person,
+                      size: 42,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // 42. Nama Mahasiswa
+                  Text(
+                    studentName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // 42. NIM Mahasiswa
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo.shade50,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.indigo.shade200),
+                    ),
+                    child: Text(
+                      'NIM: $studentId',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Colors.indigo.shade800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Teknologi Rekayasa Perangkat Lunak',
+                    style: TextStyle(fontSize: 13, color: Colors.black54),
+                  ),
+                  const Text(
+                    'Universitas Pendidikan Ganesha (Undiksha)',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Detail Kredensial & Akun
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                _buildProfileTile(
+                  icon: Icons.email_outlined,
+                  title: 'Email Undiksha',
+                  subtitle: 'michael.marcel@undiksha.ac.id',
+                ),
+                const Divider(height: 1),
+                _buildProfileTile(
+                  icon: Icons.school_outlined,
+                  title: 'Status Akademik',
+                  subtitle: 'Mahasiswa Aktif - Semester 5',
+                ),
+                const Divider(height: 1),
+                _buildProfileTile(
+                  icon: Icons.phone_android_outlined,
+                  title: 'Mata Kuliah Praktikum',
+                  subtitle: 'Pemrograman Aplikasi Perangkat Bergerak',
+                ),
+                const Divider(height: 1),
+                _buildProfileTile(
+                  icon: Icons.badge_outlined,
+                  title: 'Dosen Pengampu',
+                  subtitle: 'I Made Agus Wirahadi Putra, S.Kom., M.Cs.',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.indigo),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 12, color: Colors.grey),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
         ),
       ),
     );
